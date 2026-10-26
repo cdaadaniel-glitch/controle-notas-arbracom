@@ -13,175 +13,208 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* Layout: cabeçalho com totais por situação, gráfico mensal, avisos, depois a lista de orçamentos por mês com status editável. */
+/* Layout limpo: resumo em uma faixa, abas (Recebimentos / Por mês / Divergências), listas em linhas que viram cartões no celular. */
 :root {
-  --bg: #f3f6f8; --panel: #ffffff; --fg: #14232e; --muted: #5b6b77; --line: #d9e1e7;
-  --accent: #1d5f86; --accent-soft: #e2eef5;
-  --ok: #23804f; --ok-soft: #e1f2e8;
-  --warn: #a8670b; --warn-soft: #fbefd9;
-  --todo: #4a5fc1; --todo-soft: #e6e9fa;
-  --bad: #b33a35; --bad-soft: #f8e3e1;
+  --bg: #ffffff; --soft: #f4f7f9; --fg: #15232d; --muted: #66757f; --line: #e3e9ee;
+  --accent: #1d5f86; --accent-soft: #e6f0f6;
+  --ok: #1f7a4a; --ok-soft: #e3f3ea;
+  --warn: #9a5f07; --warn-soft: #fcf1dc;
+  --bad: #b0352f; --bad-soft: #fbe6e4;
+  --todo: #4757b8; --todo-soft: #e9ecfb;
   --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f171d; --panel: #16212a; --fg: #e4ecf1; --muted: #93a4b0; --line: #2a3843;
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #10181e; --soft: #17222a; --fg: #e5edf2; --muted: #93a3ae; --line: #26343e;
   --accent: #6cb4de; --accent-soft: #1a3344;
-  --ok: #5cc98d; --ok-soft: #173326; --warn: #e5a94a; --warn-soft: #3a2c14;
-  --todo: #97a6f2; --todo-soft: #23284a; --bad: #ec7f78; --bad-soft: #3d1f1d; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #0f171d; --panel: #16212a; --fg: #e4ecf1; --muted: #93a4b0; --line: #2a3843;
-  --accent: #6cb4de; --accent-soft: #1a3344;
-  --ok: #5cc98d; --ok-soft: #173326; --warn: #e5a94a; --warn-soft: #3a2c14;
-  --todo: #97a6f2; --todo-soft: #23284a; --bad: #ec7f78; --bad-soft: #3d1f1d; color-scheme: dark }
-body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.45; }
-.wrap { max-width: 1180px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
-h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
-h2 { font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.01em; }
-.sub { color: var(--muted); margin: 4px 0 0; }
+  --ok: #5cc98d; --ok-soft: #163126; --warn: #e5a94a; --warn-soft: #372a13;
+  --bad: #ef837c; --bad-soft: #3b1f1d; --todo: #9eabf3; --todo-soft: #222849; color-scheme: dark } }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: max(20px, env(safe-area-inset-top, 0px)) 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+.wrap > * { min-width: 0; }
 .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
 .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
-.conn { font-size: 12px; color: var(--muted); }
-.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 820px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.tiles2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; border-top: 3px solid var(--c); min-width: 0; }
-.tile .v { font-family: var(--font-num); font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.tile .n { font-size: 12px; color: var(--muted); }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
-.row2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
-@media (max-width: 900px) { .row2 { grid-template-columns: minmax(0, 1fr); } }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
-.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
-#chart { width: 100%; position: relative; }
-#chart svg { display: block; width: 100%; height: auto; }
-#tip { position: absolute; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; }
-.avisos { display: grid; align-content: start; gap: 10px; margin: 0; padding: 0; list-style: none; max-height: 420px; overflow: auto; }
-.avisos li { border-left: 3px solid var(--c, var(--warn)); background: var(--bg); padding: 8px 10px; border-radius: 0 6px 6px 0; display: grid; gap: 2px; }
-.avisos b { font-size: 13px; }
-.avisos p { margin: 0; color: var(--muted); font-size: 12.5px; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.chip { border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 12.5px; cursor: pointer; }
-.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-.chip:focus-visible, select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.month { display: grid; gap: 8px; }
-.month-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
-.month-h h3 { margin: 0; font-size: 17px; font-weight: 800; }
-.month-h .tot { font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 12px; }
-.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
-table { border-collapse: collapse; width: 100%; min-width: 760px; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; background: var(--bg); }
-tr:last-child td { border-bottom: 0; }
-td.val { text-align: right; white-space: nowrap; }
-th.val { text-align: right; }
-td.cod { font-family: var(--font-num); color: var(--muted); white-space: nowrap; }
-.desc { font-weight: 600; }
-.obs { color: var(--muted); font-size: 12px; margin-top: 2px; }
-.obs.alert { color: var(--bad); }
-select.st { font: inherit; font-size: 12.5px; font-weight: 700; border-radius: 999px; padding: 3px 8px; border: 1px solid transparent; background: var(--s-bg); color: var(--s-fg); cursor: pointer; }
-select.rc { font: inherit; font-size: 12.5px; font-weight: 600; border-radius: 6px; padding: 3px 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
-select.rc.yes { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
-input.dt { font: inherit; font-size: 12px; padding: 2px 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--fg); margin-top: 4px; display: block; }
-.dash { color: var(--muted); }
-input.nf { font: inherit; font-family: var(--font-num); font-size: 12.5px; width: 92px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--fg); }
-.s-emitida { --s-bg: var(--ok-soft); --s-fg: var(--ok); }
-.s-pendente { --s-bg: var(--warn-soft); --s-fg: var(--warn); }
-.s-a_emitir { --s-bg: var(--todo-soft); --s-fg: var(--todo); }
-.s-conferir { --s-bg: var(--bad-soft); --s-fg: var(--bad); }
-form.add { display: grid; grid-template-columns: 110px 70px minmax(0, 2fr) 120px 150px auto; gap: 8px; align-items: end; }
-@media (max-width: 820px) { form.add { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-form.add input, form.add select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--fg); min-width: 0; text-transform: none; letter-spacing: 0; font-weight: 400; }
-.btn { font: inherit; font-weight: 700; font-size: 13px; padding: 7px 14px; border-radius: 6px; border: 0; background: var(--accent); color: var(--bg); cursor: pointer; }
-.empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
-.toast { font-size: 12px; color: var(--ok); min-height: 1em; }
-details summary { cursor: pointer; font-weight: 700; }
-#login { max-width: 360px; margin: 12vh auto 0; padding-block: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-#login form { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
-#login label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
-#login input { font: inherit; font-size: 15px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--fg); }
-#login-msg { font-size: 13px; color: var(--bad); min-height: 1em; margin: 0; }
+h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 0; font-weight: 700; }
+header { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.status { font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
 .link { background: none; border: 0; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; }
+
+/* resumo */
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.summary > div { padding: 16px 16px 16px 0; display: grid; gap: 4px; min-width: 0; }
+.summary > div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+.summary .v { font-family: var(--font-num); font-size: 22px; font-weight: 600; overflow-wrap: anywhere; }
+.summary .n { font-size: 12px; color: var(--muted); }
+.v.bad { color: var(--bad); } .v.ok { color: var(--ok); } .v.todo { color: var(--todo); }
+.minor { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: -16px; }
+.minor b { color: var(--fg); font-family: var(--font-num); font-weight: 600; }
+@media (max-width: 720px) {
+  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary > div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .summary > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* abas */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 12px; font: inherit; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tab .count { font-family: var(--font-num); font-size: 12px; background: var(--soft); border-radius: 999px; padding: 1px 7px; margin-left: 4px; color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* linhas */
+.list { display: grid; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) 130px 150px 190px; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.item .t { font-weight: 700; }
+.item .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.item .val { font-family: var(--font-num); font-weight: 600; text-align: right; }
+.item .act { display: flex; justify-content: flex-end; }
+@media (max-width: 720px) {
+  .item { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t v" "w a"; gap: 8px 12px; align-items: start; }
+  .item > :nth-child(1) { grid-area: t; } .item .when { grid-area: w; } .item .val { grid-area: v; } .item .act { grid-area: a; align-self: end; }
+  .item .btn { padding: 8px 10px; }
+  .tab { padding: 10px 8px; font-size: 13.5px; }
+  .summary .v { font-size: 17px; }
+  .summary > div { padding-right: 8px; }
+  .summary > div + div { padding-left: 12px; }
+}
+.badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.b-bad { background: var(--bad-soft); color: var(--bad); }
+.b-warn { background: var(--warn-soft); color: var(--warn); }
+.b-ok { background: var(--ok-soft); color: var(--ok); }
+.b-muted { background: var(--soft); color: var(--muted); }
+.when .d { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.btn { font: inherit; font-weight: 700; font-size: 13px; padding: 9px 14px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-ghost { background: none; border-color: var(--line); color: var(--fg); }
+.btn-done { background: var(--ok-soft); color: var(--ok); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+input.date, input.nf, select.st, form.add input, form.add select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); min-width: 0; }
+input.nf { width: 90px; font-family: var(--font-num); }
+.subhead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 22px; padding-bottom: 6px; }
+.subhead h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.subhead .tot { font-size: 12.5px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.empty { color: var(--muted); padding: 28px 0; }
+.hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* por mês */
+.row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 120px 130px 100px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.row .cod { font-family: var(--font-num); color: var(--muted); font-size: 13px; }
+.row .val { font-family: var(--font-num); text-align: right; }
+.row .obs { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.row .obs.alert { color: var(--bad); }
+.row .em { font-size: 12px; color: var(--muted); margin-top: 4px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+select.st { font-weight: 700; border: 0; border-radius: 999px; padding: 4px 10px; background: var(--sbg); color: var(--sfg); }
+.s-emitida { --sbg: var(--ok-soft); --sfg: var(--ok); }
+.s-pendente { --sbg: var(--warn-soft); --sfg: var(--warn); }
+.s-a_emitir { --sbg: var(--todo-soft); --sfg: var(--todo); }
+.s-conferir { --sbg: var(--bad-soft); --sfg: var(--bad); }
+@media (max-width: 720px) {
+  .row { grid-template-columns: 36px minmax(0, 1fr) auto; }
+  .row .stc { grid-column: 2; } .row .nfc { grid-column: 3; }
+}
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.chip { border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+details.add { margin-top: 24px; }
+details.add summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+form.add { display: grid; grid-template-columns: 130px 70px minmax(0, 1fr) 120px 160px auto; gap: 8px; align-items: end; margin-top: 12px; }
+form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+@media (max-width: 720px) { form.add { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.toast { font-size: 13px; color: var(--ok); min-height: 1em; margin-top: 8px; }
+
+/* divergências */
+.avisos { list-style: none; margin: 0; padding: 0; display: grid; }
+.avisos li { padding: 14px 0 14px 14px; border-bottom: 1px solid var(--line); border-left: 3px solid var(--c); display: grid; gap: 3px; }
+.avisos b { font-size: 14px; }
+.avisos p { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 70ch; }
+
+/* login */
+#login { max-width: 360px; margin: 14vh auto 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#login form { display: grid; gap: 12px; margin-top: 20px; }
+#login label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
+#login input { font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); }
+#login-msg { font-size: 13px; color: var(--bad); min-height: 1em; margin: 0; }
 </style>
-<style>html, body { margin: 0; } [hidden] { display: none !important; } :root { padding-top: env(safe-area-inset-top, 0px); }</style>
 </head>
 <body>
+
 <div id="login">
   <div class="eyebrow">Swift fora da garantia · ARBRACOM</div>
-  <h1 style="margin:4px 0 16px">Controle de notas</h1>
+  <h1>Controle de notas</h1>
   <form id="loginform">
     <label for="l-email">E-mail<input id="l-email" type="email" autocomplete="username" required></label>
     <label for="l-senha">Senha<input id="l-senha" type="password" autocomplete="current-password" required></label>
-    <button class="btn" type="submit">Entrar</button>
+    <button class="btn btn-primary" type="submit">Entrar</button>
     <p id="login-msg"></p>
   </form>
 </div>
+
 <div class="wrap" id="app" hidden>
   <header>
     <div>
       <div class="eyebrow">Swift fora da garantia · ARBRACOM</div>
       <h1>Controle de notas</h1>
-      <p class="sub">Orçamentos por mês e a situação da nota de cada um. Mude a situação, o nº da NF ou o recebimento direto na lista; fica salvo na hora.</p>
     </div>
-    <div class="conn"><span id="conn">Conectando…</span> · <button class="link" id="sair" type="button">Sair</button></div>
+    <div class="status"><span id="conn">Carregando…</span><button class="link" id="sair" type="button">Sair</button></div>
   </header>
 
-  <section class="tiles" id="tiles">
-    <div class="tile" style="--c: var(--ok)"><span class="eyebrow">Notas emitidas</span><span class="v" id="t-emitida">—</span><span class="n" id="n-emitida"></span></div>
-    <div class="tile" style="--c: var(--warn)"><span class="eyebrow">Pendente · pedido cobrado</span><span class="v" id="t-pendente">—</span><span class="n" id="n-pendente"></span></div>
-    <div class="tile" style="--c: var(--todo)"><span class="eyebrow">Falta tirar nota</span><span class="v" id="t-a_emitir">—</span><span class="n" id="n-a_emitir"></span></div>
-    <div class="tile" style="--c: var(--bad)"><span class="eyebrow">A conferir</span><span class="v" id="t-conferir">—</span><span class="n" id="n-conferir"></span></div>
-  </section>
-
-  <section class="tiles tiles2">
-    <div class="tile" style="--c: var(--accent)"><span class="eyebrow">Recebido</span><span class="v" id="t-recebida">—</span><span class="n" id="n-recebida"></span></div>
-    <div class="tile" style="--c: var(--warn)"><span class="eyebrow">Emitida · a receber</span><span class="v" id="t-areceber">—</span><span class="n" id="n-areceber"></span></div>
-  </section>
-
-  <section class="row2">
-    <div class="panel">
-      <div class="month-h"><h2>Valor por mês e situação</h2>
-        <div class="legend"><span style="--c: var(--ok)">Emitida</span><span style="--c: var(--warn)">Pendente</span><span style="--c: var(--todo)">Falta tirar</span><span style="--c: var(--bad)">A conferir</span></div>
-      </div>
-      <div id="chart"><div class="empty">O gráfico aparece quando os orçamentos carregarem.</div></div>
-    </div>
-    <div class="panel">
-      <h2>Divergências encontradas</h2>
-      <ul class="avisos" id="avisos"><li><p>Carregando…</p></li></ul>
+  <section>
+    <div class="summary">
+      <div><span class="eyebrow">A receber</span><span class="v" id="k-areceber">—</span><span class="n" id="k-areceber-n"></span></div>
+      <div><span class="eyebrow">Vencido</span><span class="v bad" id="k-vencido">—</span><span class="n" id="k-vencido-n"></span></div>
+      <div><span class="eyebrow">Recebido</span><span class="v ok" id="k-recebido">—</span><span class="n" id="k-recebido-n"></span></div>
+      <div><span class="eyebrow">Falta tirar nota</span><span class="v todo" id="k-aemitir">—</span><span class="n" id="k-aemitir-n"></span></div>
     </div>
   </section>
+  <div class="minor">
+    <span>Pendente, pedido cobrado: <b id="k-pendente">—</b></span>
+    <span>A conferir: <b id="k-conferir">—</b></span>
+    <span>Prazo de recebimento: <b>40 dias</b> após a emissão</span>
+  </div>
 
-  <section class="panel">
-    <div class="month-h">
-      <h2>Orçamentos</h2>
-      <div class="toolbar" id="filters" role="group" aria-label="Filtrar por situação">
+  <section>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-receb" aria-selected="true" data-v="receb">Recebimentos<span class="count" id="c-receb">0</span></button>
+      <button class="tab" role="tab" id="tab-meses" aria-selected="false" data-v="meses">Por mês</button>
+      <button class="tab" role="tab" id="tab-div" aria-selected="false" data-v="div">Divergências<span class="count" id="c-div">0</span></button>
+    </div>
+
+    <div id="v-receb">
+      <div class="list" id="l-areceber"></div>
+      <div class="subhead"><h3>Recebidas</h3><div class="tot num" id="t-recebidas"></div></div>
+      <div class="list" id="l-recebidas"></div>
+    </div>
+
+    <div id="v-meses" hidden>
+      <div class="filters" id="filters">
         <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
         <button class="chip" data-f="emitida" aria-pressed="false">Emitidas</button>
         <button class="chip" data-f="pendente" aria-pressed="false">Pendentes</button>
         <button class="chip" data-f="a_emitir" aria-pressed="false">Falta tirar</button>
         <button class="chip" data-f="conferir" aria-pressed="false">A conferir</button>
-        <button class="chip" data-f="areceber" aria-pressed="false">A receber</button>
-        <button class="chip" data-f="recebida" aria-pressed="false">Recebidas</button>
       </div>
+      <div id="months"></div>
+      <details class="add">
+        <summary>Adicionar orçamento</summary>
+        <form class="add" id="addform">
+          <label for="f-mes">Mês<input id="f-mes" type="month" required></label>
+          <label for="f-cod">Nº<input id="f-cod" placeholder="1.1"></label>
+          <label for="f-desc">Descrição<input id="f-desc" required placeholder="Corretiva refrigeração L.Física GO e DF"></label>
+          <label for="f-valor">Valor (R$)<input id="f-valor" required inputmode="decimal" placeholder="12.345,67"></label>
+          <label for="f-status">Situação<select id="f-status"><option value="a_emitir">Falta tirar</option><option value="pendente">Pendente · pedido cobrado</option><option value="emitida">Emitida</option><option value="conferir">A conferir</option></select></label>
+          <button class="btn btn-primary" type="submit">Adicionar</button>
+        </form>
+        <div class="toast" id="toast"></div>
+      </details>
     </div>
-    <div id="months" style="display:grid; gap:22px"><div class="empty">Nenhum orçamento ainda. Use "Adicionar orçamento" abaixo para lançar o primeiro.</div></div>
-  </section>
 
-  <section class="panel">
-    <details>
-      <summary>Adicionar orçamento</summary>
-      <form class="add" id="addform" style="margin-top:12px">
-        <label for="f-mes">Mês<input id="f-mes" type="month" required value="2026-11"></label>
-        <label for="f-cod">Nº<input id="f-cod" placeholder="1.1"></label>
-        <label for="f-desc">Descrição<input id="f-desc" required placeholder="Corretiva refrigeração L.Física GO e DF"></label>
-        <label for="f-valor">Valor (R$)<input id="f-valor" required inputmode="decimal" placeholder="12.345,67"></label>
-        <label for="f-status">Situação<select id="f-status"><option value="a_emitir">Falta tirar</option><option value="pendente">Pendente · pedido cobrado</option><option value="emitida">Emitida</option><option value="conferir">A conferir</option></select></label>
-        <button class="btn" type="submit">Adicionar</button>
-      </form>
-      <div class="toast" id="toast"></div>
-    </details>
+    <div id="v-div" hidden>
+      <ul class="avisos" id="avisos"></ul>
+    </div>
   </section>
 </div>
 
@@ -189,187 +222,182 @@ details summary { cursor: pointer; font-weight: 700; }
 <script src="config.js"></script>
 <script>
 (function () {
+  const PRAZO = 40;
   const ST = { emitida: "Emitida", pendente: "Pendente", a_emitir: "Falta tirar", conferir: "A conferir" };
-  const COLOR = { emitida: "var(--ok)", pendente: "var(--warn)", a_emitir: "var(--todo)", conferir: "var(--bad)" };
   const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const brl = v => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const soma = l => l.reduce((s, r) => s + (Number(r.valor) || 0), 0);
   const mesLabel = m => { const [y, mm] = String(m).split("-"); return (MESES[Number(mm) - 1] || m) + " " + y; };
+  const hoje = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+  const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const parse = s => { if (!s) return null; const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const fmt = d => d ? d.toLocaleDateString("pt-BR") : "";
+  const addDias = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  let rows = [], avisos = [], filtro = "todos", db = null, readonly = false;
-  const toRow = r => ({ _id: r.id, mes: r.mes, cod: r.cod, desc: r.descricao, valor: Number(r.valor), status: r.status, nf: r.nf, obs: r.obs, alerta: r.alerta, recebida: r.recebida, recebidaEm: r.recebida_em || "" });
-  const COLS = { desc: "descricao", recebidaEm: "recebida_em" };
-  const toDb = p => { const o = {}; for (const k in p) o[COLS[k] || k] = (k === "recebidaEm" && !p[k]) ? null : p[k]; return o; };
+  let rows = [], avisos = [], filtro = "todos", db = null, view = "receb";
 
+  const toRow = r => ({ _id: r.id, mes: r.mes, cod: r.cod, desc: r.descricao, valor: Number(r.valor), status: r.status, nf: r.nf, obs: r.obs, alerta: r.alerta, recebida: r.recebida, recebidaEm: r.recebida_em || "", emitidaEm: r.emitida_em || "" });
+  const COLS = { desc: "descricao", recebidaEm: "recebida_em", emitidaEm: "emitida_em" };
+  const toDb = p => { const o = {}; for (const k in p) o[COLS[k] || k] = ((k === "recebidaEm" || k === "emitidaEm") && !p[k]) ? null : p[k]; return o; };
+
+  // previsão de recebimento e situação do prazo
+  function prazo(r) {
+    const em = parse(r.emitidaEm);
+    if (!em) return { prev: null, dias: null, cls: "b-muted", txt: "Sem data de emissão" };
+    const prev = addDias(em, PRAZO), dias = Math.round((prev - hoje()) / 864e5);
+    if (dias < 0) return { prev, dias, cls: "b-bad", txt: "Vencida há " + (-dias) + (dias === -1 ? " dia" : " dias") };
+    if (dias === 0) return { prev, dias, cls: "b-warn", txt: "Vence hoje" };
+    if (dias <= 7) return { prev, dias, cls: "b-warn", txt: "Vence em " + dias + (dias === 1 ? " dia" : " dias") };
+    return { prev, dias, cls: "b-ok", txt: "No prazo · " + dias + " dias" };
+  }
+
+  // abas
+  document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+    view = t.dataset.v;
+    document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    ["receb", "meses", "div"].forEach(v => document.getElementById("v-" + v).hidden = v !== view);
+  }));
   document.querySelectorAll("#filters .chip").forEach(b => b.addEventListener("click", () => {
     filtro = b.dataset.f;
     document.querySelectorAll("#filters .chip").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    renderMonths();
+    renderMeses();
   }));
 
-  function renderTiles() {
-    for (const k of Object.keys(ST)) {
-      const list = rows.filter(r => r.status === k);
-      document.getElementById("t-" + k).textContent = brl(list.reduce((s, r) => s + (Number(r.valor) || 0), 0));
-      document.getElementById("n-" + k).textContent = list.length + (list.length === 1 ? " orçamento" : " orçamentos");
-    }
+  function renderResumo() {
     const em = rows.filter(r => r.status === "emitida");
-    for (const [k, list] of [["recebida", em.filter(r => r.recebida)], ["areceber", em.filter(r => !r.recebida)]]) {
-      document.getElementById("t-" + k).textContent = brl(list.reduce((s, r) => s + (Number(r.valor) || 0), 0));
-      document.getElementById("n-" + k).textContent = list.length + (list.length === 1 ? " nota" : " notas");
-    }
+    const ar = em.filter(r => !r.recebida), rc = em.filter(r => r.recebida);
+    const venc = ar.filter(r => { const p = prazo(r); return p.dias != null && p.dias < 0; });
+    const ae = rows.filter(r => r.status === "a_emitir");
+    const set = (id, l, unid) => { document.getElementById(id).textContent = brl(soma(l)); document.getElementById(id + "-n").textContent = l.length + " " + unid + (l.length === 1 ? "" : "s"); };
+    set("k-areceber", ar, "nota"); set("k-vencido", venc, "nota"); set("k-recebido", rc, "nota"); set("k-aemitir", ae, "orçamento");
+    document.getElementById("k-pendente").textContent = brl(soma(rows.filter(r => r.status === "pendente")));
+    document.getElementById("k-conferir").textContent = brl(soma(rows.filter(r => r.status === "conferir")));
+    document.getElementById("c-receb").textContent = ar.length;
+    document.getElementById("c-div").textContent = avisos.length;
   }
-  const passa = r => filtro === "todos" || r.status === filtro || (filtro === "recebida" && r.status === "emitida" && r.recebida) || (filtro === "areceber" && r.status === "emitida" && !r.recebida);
 
-  function renderChart() {
-    const box = document.getElementById("chart");
-    const months = [...new Set(rows.map(r => r.mes))].sort();
-    if (!months.length) { box.replaceChildren(el("div", "empty", "O gráfico aparece quando os orçamentos carregarem.")); return; }
-    const keys = ["emitida", "pendente", "a_emitir", "conferir"];
-    const data = months.map(m => { const o = { m }; keys.forEach(k => o[k] = rows.filter(r => r.mes === m && r.status === k).reduce((s, r) => s + (Number(r.valor) || 0), 0)); o.total = keys.reduce((s, k) => s + o[k], 0); return o; });
-    const W = Math.max(320, box.clientWidth || 600), H = 240, L = 54, R = 8, T = 10, B = 26;
-    const max = Math.max(...data.map(d => d.total)) || 1;
-    const step = max > 100000 ? 50000 : max > 40000 ? 20000 : 10000;
-    const top = Math.ceil(max / step) * step;
-    const y = v => T + (H - T - B) * (1 - v / top);
-    const bw = (W - L - R) / data.length;
-    const ns = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("width", "100%"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Valor dos orçamentos por mês, por situação da nota");
-    const mk = (n, a) => { const e = document.createElementNS(ns, n); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
-    for (let v = 0; v <= top; v += step) {
-      mk("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: "var(--line)", "stroke-width": 1 });
-      const t = mk("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "IBM Plex Mono, monospace" });
-      t.textContent = v === 0 ? "0" : (v / 1000) + " mil";
-    }
-    const tip = el("div"); tip.id = "tip"; tip.hidden = true;
-    data.forEach((d, i) => {
-      let acc = 0; const x = L + i * bw + bw * 0.18, w = bw * 0.64;
-      keys.forEach(k => {
-        if (!d[k]) return;
-        const r = mk("rect", { x, width: w, y: y(acc + d[k]), height: Math.max(0.5, y(acc) - y(acc + d[k])), fill: COLOR[k] });
-        r.addEventListener("mousemove", ev => {
-          tip.hidden = false; tip.textContent = `${mesLabel(d.m)} · ${ST[k]}: ${brl(d[k])}`;
-          const bb = box.getBoundingClientRect(); let lx = ev.clientX - bb.left + 10;
-          if (lx + 220 > bb.width) lx = ev.clientX - bb.left - 230;
-          tip.style.left = Math.max(0, lx) + "px"; tip.style.top = (ev.clientY - bb.top - 30) + "px";
-        });
-        r.addEventListener("mouseleave", () => tip.hidden = true);
-        acc += d[k];
-      });
-      const t = mk("text", { x: x + w / 2, y: H - 8, "text-anchor": "middle", "font-size": 10.5, fill: "var(--muted)" });
-      t.textContent = (MESES[Number(d.m.split("-")[1]) - 1] || "").slice(0, 3);
-    });
-    box.replaceChildren(svg, tip);
+  function dataInput(r, campo, label) {
+    const i = el("input", "date"); i.type = "date"; i.id = campo + "-" + r._id; i.value = r[campo] || ""; i.setAttribute("aria-label", label + " de " + (r.desc || ""));
+    i.addEventListener("change", () => save(r._id, { [campo]: i.value }));
+    return i;
+  }
+
+  function renderReceb() {
+    const em = rows.filter(r => r.status === "emitida");
+    const ar = em.filter(r => !r.recebida).sort((a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); });
+    const rc = em.filter(r => r.recebida).sort((a, b) => String(b.recebidaEm).localeCompare(String(a.recebidaEm)) || String(b.mes).localeCompare(a.mes));
+    const box = document.getElementById("l-areceber");
+    if (!ar.length) box.replaceChildren(el("div", "empty", "Nenhuma nota emitida esperando pagamento."));
+    else box.replaceChildren(...ar.map(r => {
+      const p = prazo(r), it = el("div", "item");
+      const a = el("div"); a.append(el("div", "t", r.desc), el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : "")));
+      const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
+      const d = el("div", "d");
+      if (p.prev) d.textContent = "Emissão " + fmt(parse(r.emitidaEm)) + " · previsão " + fmt(p.prev);
+      else { d.textContent = "Emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
+      w.append(d);
+      const v = el("div", "val", brl(r.valor));
+      const act = el("div", "act"); const b = el("button", "btn btn-primary", "Marcar recebida"); b.type = "button";
+      b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: true, recebidaEm: iso(hoje()) }); });
+      act.append(b);
+      it.append(a, w, v, act); return it;
+    }));
+    document.getElementById("t-recebidas").textContent = rc.length ? rc.length + (rc.length === 1 ? " nota · " : " notas · ") + brl(soma(rc)) : "";
+    const lb = document.getElementById("l-recebidas");
+    if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você marcar uma nota como recebida, ela aparece aqui."));
+    else lb.replaceChildren(...rc.map(r => {
+      const it = el("div", "item");
+      const a = el("div"); a.append(el("div", "t", r.desc), el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : "")));
+      const w = el("div", "when"); w.append(el("span", "badge b-ok", "Recebida"));
+      const d = el("div", "d"); d.textContent = "em "; d.append(dataInput(r, "recebidaEm", "Data do recebimento")); w.append(d);
+      const v = el("div", "val", brl(r.valor));
+      const act = el("div", "act"); const b = el("button", "btn btn-ghost", "Desfazer"); b.type = "button";
+      b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: false, recebidaEm: "" }); });
+      act.append(b);
+      it.append(a, w, v, act); return it;
+    }));
+  }
+
+  function renderMeses() {
+    const box = document.getElementById("months");
+    const list = rows.filter(r => filtro === "todos" || r.status === filtro);
+    if (!list.length) { box.replaceChildren(el("div", "empty", rows.length ? "Nenhum orçamento com essa situação." : "Nenhum orçamento ainda. Use \"Adicionar orçamento\" abaixo.")); return; }
+    const months = [...new Set(list.map(r => r.mes))].sort().reverse();
+    box.replaceChildren(...months.flatMap(m => {
+      const all = rows.filter(r => r.mes === m);
+      const items = list.filter(r => r.mes === m).sort((a, b) => String(a.cod || "~").localeCompare(String(b.cod || "~"), "pt-BR", { numeric: true }));
+      const h = el("div", "subhead"); h.append(el("h3", null, mesLabel(m)));
+      const tot = el("div", "tot num"); tot.append(el("span", null, "Total " + brl(soma(all))));
+      const fa = soma(all.filter(r => r.status === "a_emitir")); if (fa) tot.append(el("span", null, "Falta tirar " + brl(fa)));
+      h.append(tot);
+      return [h, ...items.map(r => {
+        const row = el("div", "row");
+        row.append(el("div", "cod", r.cod || "–"));
+        const d = el("div"); d.append(el("div", "t", r.desc));
+        if (r.obs) d.append(el("div", "obs" + (r.alerta ? " alert" : ""), r.obs));
+        if (r.status === "emitida") { const e = el("div", "em"); e.append("Emissão", dataInput(r, "emitidaEm", "Data de emissão")); if (r.recebida) e.append(el("span", "badge b-ok", "Recebida")); d.append(e); }
+        row.append(d, el("div", "val", brl(r.valor)));
+        const sc = el("div", "stc"); const sel = el("select", "st s-" + r.status); sel.id = "st-" + r._id; sel.setAttribute("aria-label", "Situação de " + (r.desc || ""));
+        for (const k in ST) { const o = el("option", null, ST[k]); o.value = k; if (k === r.status) o.selected = true; sel.append(o); }
+        sel.addEventListener("change", () => { const p = { status: sel.value }; if (sel.value === "emitida" && !r.emitidaEm) p.emitidaEm = iso(hoje()); save(r._id, p); });
+        sc.append(sel);
+        const nc = el("div", "nfc"); const inp = el("input", "nf"); inp.id = "nf-" + r._id; inp.value = r.nf || ""; inp.placeholder = "nº NF"; inp.setAttribute("aria-label", "Número da NF de " + (r.desc || ""));
+        inp.addEventListener("change", () => save(r._id, { nf: inp.value.trim() }));
+        nc.append(inp);
+        row.append(sc, nc); return row;
+      })];
+    }));
   }
 
   function renderAvisos() {
     const ul = document.getElementById("avisos");
     if (!avisos.length) { ul.replaceChildren(el("li", null, "Nenhuma divergência registrada.")); return; }
-    ul.replaceChildren(...avisos.sort((a, b) => (a.ordem || 0) - (b.ordem || 0)).map(a => {
+    ul.replaceChildren(...[...avisos].sort((a, b) => (a.ordem || 0) - (b.ordem || 0)).map(a => {
       const li = el("li"); li.style.setProperty("--c", a.nivel === "ok" ? "var(--ok)" : a.nivel === "alto" ? "var(--bad)" : "var(--warn)");
       li.append(el("b", null, a.titulo || ""), el("p", null, a.texto || "")); return li;
     }));
   }
 
+  function renderAll() { renderResumo(); renderReceb(); renderMeses(); renderAvisos(); }
+  const setConn = t => document.getElementById("conn").textContent = t;
+
   async function save(id, patch) {
-    if (!db || readonly) return;
     const { error } = await db.from(T.notas).update(toDb(patch)).eq("id", id);
-    if (error) { setConn("Não foi possível salvar: " + error.message); return; }
+    if (error) {
+      setConn(/emitida_em/.test(error.message) ? "Falta criar o campo de data de emissão no banco." : "Não foi possível salvar: " + error.message);
+      renderAll(); return;
+    }
     const r = rows.find(x => x._id === id); if (r) Object.assign(r, patch);
     setConn("Salvo"); renderAll();
   }
-
-  function renderMonths() {
-    const box = document.getElementById("months");
-    const list = rows.filter(passa);
-    if (!rows.length) { box.replaceChildren(el("div", "empty", "Nenhum orçamento ainda. Use \"Adicionar orçamento\" abaixo para lançar o primeiro.")); return; }
-    if (!list.length) { box.replaceChildren(el("div", "empty", "Nenhum orçamento com essa situação.")); return; }
-    const months = [...new Set(list.map(r => r.mes))].sort().reverse();
-    box.replaceChildren(...months.map(m => {
-      const items = list.filter(r => r.mes === m).sort((a, b) => String(a.cod || "~").localeCompare(String(b.cod || "~"), "pt-BR", { numeric: true }) || String(a.desc).localeCompare(String(b.desc)));
-      const all = rows.filter(r => r.mes === m);
-      const sec = el("div", "month");
-      const h = el("div", "month-h"); h.append(el("h3", null, mesLabel(m)));
-      const tot = el("div", "tot num");
-      tot.append(el("span", null, "Total " + brl(all.reduce((s, r) => s + (Number(r.valor) || 0), 0))));
-      for (const k of Object.keys(ST)) { const v = all.filter(r => r.status === k).reduce((s, r) => s + (Number(r.valor) || 0), 0); if (v) { const s = el("span", null, ST[k] + " " + brl(v)); s.style.color = COLOR[k]; tot.append(s); } }
-      h.append(tot); sec.append(h);
-      const tb = el("div", "tablebox"); const t = el("table");
-      const thead = el("thead"); const hr = el("tr");
-      [["Nº", ""], ["Orçamento", ""], ["Valor", "val"], ["Situação", ""], ["NF", ""], ["Recebimento", ""]].forEach(([n, c]) => hr.append(el("th", c, n)));
-      thead.append(hr); t.append(thead);
-      const tbody = el("tbody");
-      items.forEach(r => {
-        const tr = el("tr");
-        tr.append(el("td", "cod", r.cod || "–"));
-        const d = el("td"); d.append(el("div", "desc", r.desc || ""));
-        if (r.obs) d.append(el("div", "obs" + (r.alerta ? " alert" : ""), r.obs));
-        tr.append(d);
-        tr.append(el("td", "val num", brl(r.valor)));
-        const sc = el("td"); const sel = el("select", "st s-" + r.status); sel.id = "st-" + r._id; sel.setAttribute("aria-label", "Situação da nota de " + (r.desc || ""));
-        for (const k of Object.keys(ST)) { const o = el("option", null, ST[k]); o.value = k; if (k === r.status) o.selected = true; sel.append(o); }
-        sel.disabled = readonly || !db;
-        sel.addEventListener("change", () => { sel.className = "st s-" + sel.value; save(r._id, { status: sel.value }); });
-        sc.append(sel); tr.append(sc);
-        const nc = el("td"); const inp = el("input", "nf"); inp.id = "nf-" + r._id; inp.value = r.nf || ""; inp.placeholder = "nº NF"; inp.setAttribute("aria-label", "Número da NF de " + (r.desc || ""));
-        inp.disabled = readonly || !db;
-        inp.addEventListener("change", () => save(r._id, { nf: inp.value.trim() }));
-        nc.append(inp); tr.append(nc);
-        const rc = el("td");
-        if (r.status === "emitida") {
-          const rs = el("select", "rc" + (r.recebida ? " yes" : "")); rs.id = "rc-" + r._id; rs.setAttribute("aria-label", "Recebimento de " + (r.desc || ""));
-          [["0", "A receber"], ["1", "Recebida"]].forEach(([v, t]) => { const o = el("option", null, t); o.value = v; if ((r.recebida ? "1" : "0") === v) o.selected = true; rs.append(o); });
-          rs.disabled = readonly || !db;
-          rs.addEventListener("change", () => { const yes = rs.value === "1"; rs.className = "rc" + (yes ? " yes" : ""); save(r._id, yes ? { recebida: true } : { recebida: false, recebidaEm: "" }); });
-          rc.append(rs);
-          if (r.recebida) {
-            const dt = el("input", "dt"); dt.type = "date"; dt.id = "dt-" + r._id; dt.value = r.recebidaEm || ""; dt.setAttribute("aria-label", "Data do recebimento de " + (r.desc || ""));
-            dt.disabled = readonly || !db;
-            dt.addEventListener("change", () => save(r._id, { recebidaEm: dt.value }));
-            rc.append(dt);
-          }
-        } else rc.append(el("span", "dash", "–"));
-        tr.append(rc);
-        tbody.append(tr);
-      });
-      t.append(tbody); tb.append(t); sec.append(tb); return sec;
-    }));
-  }
-
-  function renderAll() { renderTiles(); renderChart(); renderMonths(); }
-  function setConn(t) { document.getElementById("conn").textContent = t; }
-
-  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderChart, 150); });
-
-  document.getElementById("addform").addEventListener("submit", async ev => {
-    ev.preventDefault();
-    const toast = document.getElementById("toast");
-    if (!db || readonly) { toast.textContent = "Não foi possível salvar: esta visualização não tem acesso para editar."; return; }
-    const raw = document.getElementById("f-valor").value.trim();
-    const valor = Number(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
-    if (!isFinite(valor) || valor <= 0) { toast.textContent = "Informe o valor no formato 12.345,67."; return; }
-    try {
-      const { error } = await db.from(T.notas).insert(toDb({ mes: document.getElementById("f-mes").value, cod: document.getElementById("f-cod").value.trim(), desc: document.getElementById("f-desc").value.trim(), valor, status: document.getElementById("f-status").value, nf: "", obs: "" }));
-      if (error) throw error;
-      await carregar();
-      toast.textContent = "Orçamento adicionado."; ev.target.reset(); document.getElementById("f-mes").value = "2026-11";
-    } catch (e) { toast.textContent = "Não foi possível salvar: " + ((e && e.message) || "tente de novo."); }
-  });
 
   async function carregar() {
     const [n, a] = await Promise.all([db.from(T.notas).select("*"), db.from(T.avisos).select("*")]);
     if (n.error) { setConn("Erro ao carregar: " + n.error.message); return; }
     rows = n.data.map(toRow); avisos = a.data || [];
-    if (!rows.length) setConn("Seu e-mail ainda não foi liberado, ou o banco está vazio."); else setConn("Atualizado " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }));
-    renderAll(); renderAvisos();
+    setConn(rows.length ? "Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Seu e-mail ainda não foi liberado, ou o banco está vazio.");
+    renderAll();
   }
+
+  document.getElementById("addform").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const toast = document.getElementById("toast");
+    const valor = Number(document.getElementById("f-valor").value.trim().replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    if (!isFinite(valor) || valor <= 0) { toast.textContent = "Informe o valor no formato 12.345,67."; return; }
+    const status = document.getElementById("f-status").value;
+    const novo = { mes: document.getElementById("f-mes").value, cod: document.getElementById("f-cod").value.trim(), desc: document.getElementById("f-desc").value.trim(), valor, status, nf: "", obs: "" };
+    if (status === "emitida") novo.emitidaEm = iso(hoje());
+    const { error } = await db.from(T.notas).insert(toDb(novo));
+    if (error) { toast.textContent = "Não foi possível salvar: " + error.message; return; }
+    toast.textContent = "Orçamento adicionado."; ev.target.reset(); document.getElementById("f-mes").value = iso(hoje()).slice(0, 7);
+    carregar();
+  });
+  document.getElementById("f-mes").value = iso(hoje()).slice(0, 7);
+
   function entrar() { document.getElementById("login").hidden = true; document.getElementById("app").hidden = false; carregar(); }
   function sair() { document.getElementById("app").hidden = true; document.getElementById("login").hidden = false; }
 
-  if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL.includes("COLE")) {
-    document.getElementById("login-msg").textContent = "Falta configurar o endereço do Supabase em config.js.";
-    return;
-  }
+  if (!window.supabase || !window.SUPABASE_URL) { document.getElementById("login-msg").textContent = "Falta configurar o Supabase em config.js."; return; }
   const T = Object.assign({ notas: "arbracom_notas", avisos: "arbracom_avisos" }, window.TABELAS || {});
   db = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
   document.getElementById("loginform").addEventListener("submit", async ev => {
