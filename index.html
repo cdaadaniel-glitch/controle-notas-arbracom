@@ -139,6 +139,37 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
 @media (max-width: 720px) { form.add { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .toast { font-size: 13px; color: var(--ok); min-height: 1em; margin-top: 8px; }
 
+/* serviços */
+.servbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.servbar .toast { margin: 0; }
+form.serv { margin-top: 16px; padding: 16px; background: var(--soft); border-radius: 10px; }
+.sgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.sgrid .w2 { grid-column: span 2; } .sgrid .wall { grid-column: 1 / -1; }
+form.serv label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); min-width: 0; width: 100%; text-transform: none; letter-spacing: 0; font-weight: 500; }
+.sitem { display: grid; grid-template-columns: 24px minmax(0, 1fr) 130px 32px; gap: 8px; align-items: center; margin-top: 8px; }
+.sitem .n { font-family: var(--font-num); color: var(--muted); font-size: 13px; }
+.sitem input { font: inherit; font-size: 14px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); min-width: 0; }
+.sitem .rm { background: none; border: 0; color: var(--bad); font-size: 18px; cursor: pointer; }
+#s-mais { margin-top: 10px; font-size: 13px; }
+.sfoot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.sfoot .sbtns { display: flex; gap: 8px; }
+#s-total { font-weight: 700; }
+.chm { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.chm-h { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; }
+.chm-h .t { font-weight: 700; } .chm-h .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.chm-h .val { font-family: var(--font-num); font-weight: 600; }
+.chm-d { margin-top: 10px; font-size: 13px; display: grid; gap: 8px; }
+.chm-d dl { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 16px; margin: 0; }
+.chm-d dt { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.chm-d dd { margin: 0; }
+.chm-d .acts { display: flex; gap: 8px; }
+@media (max-width: 720px) {
+  .sgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sitem { grid-template-columns: 20px minmax(0, 1fr) 100px 28px; }
+  .chm-h { grid-template-columns: minmax(0, 1fr) auto; } .chm-h .badge { grid-column: 1; justify-self: start; grid-row: 2; }
+}
+
 /* divergências */
 .avisos { list-style: none; margin: 0; padding: 0; display: grid; }
 .avisos li { padding: 14px 0 14px 14px; border-bottom: 1px solid var(--line); border-left: 3px solid var(--c); display: grid; gap: 3px; }
@@ -196,6 +227,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-receb" aria-selected="true" data-v="receb">Recebimentos<span class="count" id="c-receb">0</span></button>
       <button class="tab" role="tab" id="tab-meses" aria-selected="false" data-v="meses">Por mês</button>
+      <button class="tab" role="tab" id="tab-serv" aria-selected="false" data-v="serv">Serviços<span class="count" id="c-serv">0</span></button>
       <button class="tab" role="tab" id="tab-div" aria-selected="false" data-v="div">Divergências<span class="count" id="c-div">0</span></button>
     </div>
 
@@ -228,6 +260,33 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
       </details>
     </div>
 
+    <div id="v-serv" hidden>
+      <div class="subhead"><h3 id="serv-tit">Serviços</h3><div class="tot num" id="t-serv"></div></div>
+      <div class="servbar"><button class="btn btn-primary" type="button" id="serv-novo">Novo chamado</button><button class="btn btn-ghost" type="button" id="serv-copiar">Copiar texto do mês</button><span class="toast" id="serv-toast"></span></div>
+      <form class="serv" id="servform" hidden>
+        <div class="sgrid">
+          <label for="s-chamado">Nº do chamado<input id="s-chamado" required inputmode="numeric"></label>
+          <label for="s-data">Data<input id="s-data" type="date" required></label>
+          <label for="s-loja" class="w2">Loja<input id="s-loja" list="dl-loja" required></label>
+          <label for="s-categoria">Categoria<input id="s-categoria" list="dl-categoria"></label>
+          <label for="s-equip">Nº do equipamento<input id="s-equip"></label>
+          <label for="s-tecnico">Técnico<input id="s-tecnico" list="dl-tecnico"></label>
+          <label for="s-status">Status<input id="s-status" list="dl-status"></label>
+          <label for="s-fech">Data do fechamento<input id="s-fech" type="date"></label>
+          <label for="s-tempo">Tempo gasto<input id="s-tempo" placeholder="2h30"></label>
+          <label for="s-desc" class="wall">Descrição do problema<textarea id="s-desc" rows="2"></textarea></label>
+        </div>
+        <div class="eyebrow" style="margin-top:14px">Serviços e valores</div>
+        <div id="s-itens"></div>
+        <button class="link" type="button" id="s-mais">+ Adicionar serviço</button>
+        <div class="sfoot"><span class="num" id="s-total"></span><span class="sbtns"><button class="btn btn-ghost" type="button" id="s-cancelar">Cancelar</button><button class="btn btn-primary" type="submit" id="s-salvar">Salvar chamado</button></span></div>
+      </form>
+      <datalist id="dl-loja"></datalist><datalist id="dl-tecnico"></datalist>
+      <datalist id="dl-categoria"><option value="Refrigeração"><option value="Peças"><option value="Civil"><option value="Elétrica"></datalist>
+      <datalist id="dl-status"><option value="Concluído"><option value="Em andamento"><option value="Aguardando peça"><option value="Aberto"></datalist>
+      <div class="list" id="l-serv"></div>
+    </div>
+
     <div id="v-div" hidden>
       <ul class="avisos" id="avisos"></ul>
     </div>
@@ -250,12 +309,12 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   const fmt = d => d ? d.toLocaleDateString("pt-BR") : "";
   const addDias = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  let rows = [], avisos = [], filtro = "todos", db = null, view = "receb", mesSel = "";
+  let rows = [], avisos = [], servs = [], servErro = "", filtro = "todos", db = null, view = "receb", mesSel = "";
   const base = () => mesSel ? rows.filter(r => r.mes === mesSel) : rows;
   const selMes = document.getElementById("mes-sel");
   selMes.addEventListener("change", () => { mesSel = selMes.value; renderAll(); });
   function renderSelMes() {
-    const ms = [...new Set(rows.map(r => r.mes))].sort().reverse();
+    const ms = [...new Set([...rows.map(r => r.mes), ...servs.map(s => s.mes)])].sort().reverse();
     if (mesSel && !ms.includes(mesSel)) mesSel = "";
     const o0 = el("option", null, "Todos os meses"); o0.value = "";
     selMes.replaceChildren(o0, ...ms.map(m => { const o = el("option", null, mesLabel(m).replace(/^./, c => c.toUpperCase())); o.value = m; return o; }));
@@ -281,7 +340,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
     view = t.dataset.v;
     document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t ? "true" : "false"));
-    ["receb", "meses", "div"].forEach(v => document.getElementById("v-" + v).hidden = v !== view);
+    ["receb", "meses", "serv", "div"].forEach(v => document.getElementById("v-" + v).hidden = v !== view);
   }));
   document.querySelectorAll("#filters .chip").forEach(b => b.addEventListener("click", () => {
     filtro = b.dataset.f;
@@ -398,7 +457,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     }));
   }
 
-  function renderAll() { renderSelMes(); renderResumo(); renderReceb(); renderMeses(); renderAvisos(); }
+  function renderAll() { renderSelMes(); renderResumo(); renderReceb(); renderMeses(); renderServ(); renderAvisos(); }
   const setConn = t => document.getElementById("conn").textContent = t;
 
   async function save(id, patch) {
@@ -412,9 +471,11 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   }
 
   async function carregar() {
-    const [n, a] = await Promise.all([db.from(T.notas).select("*"), db.from(T.avisos).select("*")]);
+    const [n, a, sv] = await Promise.all([db.from(T.notas).select("*"), db.from(T.avisos).select("*"), db.from(T.servicos).select("*")]);
     if (n.error) { setConn("Erro ao carregar: " + n.error.message); return; }
     rows = n.data.map(toRow); avisos = a.data || [];
+    servErro = sv.error ? "Falta criar a tabela de serviços no banco (rode o SQL de serviços no Supabase)." : "";
+    servs = sv.error ? [] : sv.data.map(s => Object.assign({}, s, { itens: Array.isArray(s.itens) ? s.itens : [] }));
     setConn(rows.length ? "Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Seu e-mail ainda não foi liberado, ou o banco está vazio.");
     renderAll();
   }
@@ -434,11 +495,112 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   });
   document.getElementById("f-mes").value = iso(hoje()).slice(0, 7);
 
+  // serviços do mês: chamados com vários serviços e valores
+  const parseValor = t => Number(String(t).trim().replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+  const fmtValor = v => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const totalServ = s => s.itens.reduce((t, i) => t + (Number(i.valor) || 0), 0);
+  const servsMes = () => (mesSel ? servs.filter(s => s.mes === mesSel) : servs).slice().sort((a, b) => String(b.data || "").localeCompare(String(a.data || "")) || String(b.chamado).localeCompare(String(a.chamado), "pt-BR", { numeric: true }));
+  const fS = id => document.getElementById(id);
+  const CAMPOS = [["chamado", "s-chamado"], ["data", "s-data"], ["loja", "s-loja"], ["categoria", "s-categoria"], ["equipamento", "s-equip"], ["tecnico", "s-tecnico"], ["status", "s-status"], ["data_fechamento", "s-fech"], ["tempo_gasto", "s-tempo"], ["descricao", "s-desc"]];
+  let editId = null; const abertosS = new Set();
+  function itemRow(i, n) {
+    const d = el("div", "sitem");
+    const sv = el("input"); sv.className = "si-s"; sv.value = i.servico || ""; sv.placeholder = "Serviço"; sv.setAttribute("aria-label", "Serviço " + n);
+    const vl = el("input"); vl.className = "si-v num"; vl.value = i.valor != null && i.valor !== "" ? fmtValor(i.valor) : ""; vl.placeholder = "Valor"; vl.inputMode = "decimal"; vl.setAttribute("aria-label", "Valor do serviço " + n);
+    vl.addEventListener("input", totalForm);
+    const rm = el("button", "rm", "×"); rm.type = "button"; rm.setAttribute("aria-label", "Remover serviço " + n);
+    rm.addEventListener("click", () => { d.remove(); renumerar(); totalForm(); });
+    d.append(el("span", "n", n + "."), sv, vl, rm); return d;
+  }
+  function renumerar() { [...fS("s-itens").children].forEach((d, k) => d.querySelector(".n").textContent = (k + 1) + "."); }
+  function lerItens() { return [...fS("s-itens").children].map(d => ({ servico: d.querySelector(".si-s").value.trim(), valor: d.querySelector(".si-v").value.trim() })).filter(i => i.servico || i.valor).map(i => ({ servico: i.servico, valor: i.valor ? parseValor(i.valor) : null })); }
+  function totalForm() { const t = lerItens().reduce((s, i) => s + (isFinite(i.valor) ? Number(i.valor) : 0), 0); fS("s-total").textContent = "Total " + brl(t); }
+  function abrirForm(s) {
+    editId = s ? s.id : null;
+    CAMPOS.forEach(([c, id]) => fS(id).value = s ? (s[c] || "") : "");
+    if (!s) fS("s-data").value = mesSel && mesSel !== iso(hoje()).slice(0, 7) ? mesSel + "-01" : iso(hoje());
+    const its = s && s.itens.length ? s.itens : [{}];
+    fS("s-itens").replaceChildren(...its.map((i, k) => itemRow(i, k + 1)));
+    fS("s-salvar").textContent = s ? "Salvar alterações" : "Salvar chamado";
+    fS("servform").hidden = false; totalForm(); fS("s-chamado").focus();
+  }
+  fS("serv-novo").addEventListener("click", () => abrirForm(null));
+  fS("s-cancelar").addEventListener("click", () => { fS("servform").hidden = true; editId = null; });
+  fS("s-mais").addEventListener("click", () => { const c = fS("s-itens"); c.append(itemRow({}, c.children.length + 1)); c.lastChild.querySelector(".si-s").focus(); });
+  fS("servform").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const toast = fS("serv-toast"), itens = lerItens();
+    if (itens.some(i => i.valor != null && !isFinite(i.valor))) { toast.textContent = "Valor no formato 1.234,56."; return; }
+    const o = {}; CAMPOS.forEach(([c, id]) => { const v = fS(id).value.trim(); o[c] = v || null; });
+    o.mes = o.data.slice(0, 7); o.itens = itens;
+    const b = fS("s-salvar"); b.disabled = true;
+    const { error } = editId ? await db.from(T.servicos).update(o).eq("id", editId) : await db.from(T.servicos).insert(o);
+    b.disabled = false;
+    if (error) { toast.textContent = "Não foi possível salvar: " + error.message; return; }
+    toast.textContent = editId ? "Chamado atualizado." : "Chamado " + o.chamado + " salvo.";
+    fS("servform").hidden = true; editId = null;
+    if (mesSel && mesSel !== o.mes) mesSel = o.mes;
+    carregar();
+  });
+  async function excluirServ(s) {
+    if (!confirm("Excluir o chamado " + s.chamado + "?")) return;
+    const { error } = await db.from(T.servicos).delete().eq("id", s.id);
+    fS("serv-toast").textContent = error ? "Não foi possível excluir: " + error.message : "Chamado excluído.";
+    if (!error) carregar();
+  }
+  const fmtD = s => s ? fmt(parse(s)) : "";
+  function textoChamado(s, n) {
+    const L = [n + "- N do chamado : " + (s.chamado || ""), "Data : " + fmtD(s.data), "Loja : " + (s.loja || ""), "Categoria : " + (s.categoria || ""), "Número do equipamento : " + (s.equipamento || ""), "Técnico : " + (s.tecnico || ""), "Status : " + (s.status || ""), "Data do fechamento : " + fmtD(s.data_fechamento), "Tempo gasto : " + (s.tempo_gasto || ""), "Descrição do problema : " + (s.descricao || "")];
+    s.itens.forEach((i, k) => L.push("Serviço " + (k + 1) + " : " + (i.servico || ""), "Valor : " + (i.valor != null ? fmtValor(i.valor) : "")));
+    return L.join("\n");
+  }
+  fS("serv-copiar").addEventListener("click", async () => {
+    const l = servsMes().slice().reverse(), toast = fS("serv-toast");
+    if (!l.length) { toast.textContent = "Nenhum chamado para copiar."; return; }
+    const txt = l.map((s, k) => textoChamado(s, k + 1)).join("\n\n");
+    try { await navigator.clipboard.writeText(txt); toast.textContent = l.length + (l.length === 1 ? " chamado copiado." : " chamados copiados."); }
+    catch (e) { toast.textContent = "Não deu para copiar neste aparelho."; }
+  });
+  function renderServ() {
+    const l = servsMes();
+    fS("c-serv").textContent = l.length;
+    fS("serv-tit").textContent = mesSel ? "Serviços de " + mesLabel(mesSel) : "Serviços (todos os meses)";
+    fS("t-serv").textContent = l.length ? l.length + (l.length === 1 ? " chamado · " : " chamados · ") + brl(l.reduce((t, s) => t + totalServ(s), 0)) : "";
+    const uniq = k => [...new Set(servs.map(s => s[k]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    fS("dl-loja").replaceChildren(...uniq("loja").map(v => { const o = el("option"); o.value = v; return o; }));
+    fS("dl-tecnico").replaceChildren(...uniq("tecnico").map(v => { const o = el("option"); o.value = v; return o; }));
+    const box = fS("l-serv");
+    if (servErro) { box.replaceChildren(el("div", "empty", servErro)); return; }
+    if (!l.length) { box.replaceChildren(el("div", "empty", "Nenhum chamado lançado" + (mesSel ? " neste mês" : "") + ". Toque em \"Novo chamado\".")); return; }
+    box.replaceChildren(...l.map(s => {
+      const c = el("div", "chm"), h = el("div", "chm-h");
+      const a = el("div"); const b = el("button", "lote"); b.type = "button"; b.setAttribute("aria-expanded", abertosS.has(s.id) ? "true" : "false");
+      b.append(el("span", "seta", "▶"), el("span", null, "Chamado " + (s.chamado || "–") + " · " + (s.loja || "")));
+      a.append(b, el("div", "s", [fmtD(s.data), s.categoria, s.tecnico, s.itens.length + (s.itens.length === 1 ? " serviço" : " serviços")].filter(Boolean).join(" · ")));
+      const st = (s.status || "").toLowerCase(), bc = /conclu|fechad|finaliz/.test(st) ? "b-ok" : st ? "b-warn" : "b-muted";
+      h.append(a, el("span", "badge " + bc, s.status || "Sem status"), el("span", "val", brl(totalServ(s))));
+      const d = el("div", "chm-d"); d.hidden = !abertosS.has(s.id);
+      const dl = el("dl");
+      [["Equipamento", s.equipamento], ["Data do fechamento", fmtD(s.data_fechamento)], ["Tempo gasto", s.tempo_gasto], ["Técnico", s.tecnico]].forEach(([k, v]) => { const w = el("div"); w.append(el("dt", null, k), el("dd", null, v || "–")); dl.append(w); });
+      d.append(dl);
+      if (s.descricao) { const w = el("div"); w.append(el("div", "eyebrow", "Descrição do problema"), el("div", null, s.descricao)); d.append(w); }
+      const sub = el("div", "sub");
+      s.itens.forEach((i, k) => { const r = el("div"); r.append(el("span", "nfn", (k + 1) + "."), el("span", null, i.servico || ""), el("span", "vv", i.valor != null ? brl(i.valor) : "–")); sub.append(r); });
+      if (s.itens.length) d.append(sub);
+      const acts = el("div", "acts"), be = el("button", "btn btn-ghost", "Editar"), bx = el("button", "btn btn-ghost", "Excluir"); be.type = bx.type = "button";
+      be.addEventListener("click", () => { abrirForm(s); fS("servform").scrollIntoView({ behavior: "smooth", block: "start" }); });
+      bx.addEventListener("click", () => excluirServ(s));
+      acts.append(be, bx); d.append(acts);
+      b.addEventListener("click", () => { const o = d.hidden; d.hidden = !o; b.setAttribute("aria-expanded", o ? "true" : "false"); o ? abertosS.add(s.id) : abertosS.delete(s.id); });
+      c.append(h, d); return c;
+    }));
+  }
+
   function entrar() { document.getElementById("login").hidden = true; document.getElementById("app").hidden = false; carregar(); }
   function sair() { document.getElementById("app").hidden = true; document.getElementById("login").hidden = false; }
 
   if (!window.supabase || !window.SUPABASE_URL) { document.getElementById("login-msg").textContent = "Falta configurar o Supabase em config.js."; return; }
-  const T = Object.assign({ notas: "arbracom_notas", avisos: "arbracom_avisos" }, window.TABELAS || {});
+  const T = Object.assign({ notas: "arbracom_notas", avisos: "arbracom_avisos", servicos: "arbracom_servicos" }, window.TABELAS || {});
   db = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
   document.getElementById("loginform").addEventListener("submit", async ev => {
     ev.preventDefault();
