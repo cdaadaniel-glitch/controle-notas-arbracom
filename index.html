@@ -40,6 +40,9 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); f
 h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 0; }
 h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 0; font-weight: 700; }
 header { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.hright { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.mesfiltro { display: flex; align-items: center; gap: 8px; }
+.mesfiltro select { font: inherit; font-size: 14px; font-weight: 700; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); cursor: pointer; }
 .status { font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
 .link { background: none; border: 0; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; }
 
@@ -159,7 +162,10 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
       <div class="eyebrow">Swift fora da garantia · ARBRACOM</div>
       <h1>Controle de notas</h1>
     </div>
-    <div class="status"><span id="conn">Carregando…</span><button class="link" id="sair" type="button">Sair</button></div>
+    <div class="hright">
+      <label class="mesfiltro" for="mes-sel"><span class="eyebrow">Mês</span><select id="mes-sel"><option value="">Todos os meses</option></select></label>
+      <div class="status"><span id="conn">Carregando…</span><button class="link" id="sair" type="button">Sair</button></div>
+    </div>
   </header>
 
   <section>
@@ -234,7 +240,17 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   const fmt = d => d ? d.toLocaleDateString("pt-BR") : "";
   const addDias = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  let rows = [], avisos = [], filtro = "todos", db = null, view = "receb";
+  let rows = [], avisos = [], filtro = "todos", db = null, view = "receb", mesSel = "";
+  const base = () => mesSel ? rows.filter(r => r.mes === mesSel) : rows;
+  const selMes = document.getElementById("mes-sel");
+  selMes.addEventListener("change", () => { mesSel = selMes.value; renderAll(); });
+  function renderSelMes() {
+    const ms = [...new Set(rows.map(r => r.mes))].sort().reverse();
+    if (mesSel && !ms.includes(mesSel)) mesSel = "";
+    const o0 = el("option", null, "Todos os meses"); o0.value = "";
+    selMes.replaceChildren(o0, ...ms.map(m => { const o = el("option", null, mesLabel(m).replace(/^./, c => c.toUpperCase())); o.value = m; return o; }));
+    selMes.value = mesSel;
+  }
 
   const toRow = r => ({ _id: r.id, mes: r.mes, cod: r.cod, desc: r.descricao, valor: Number(r.valor), status: r.status, nf: r.nf, obs: r.obs, alerta: r.alerta, recebida: r.recebida, recebidaEm: r.recebida_em || "", emitidaEm: r.emitida_em || "" });
   const COLS = { desc: "descricao", recebidaEm: "recebida_em", emitidaEm: "emitida_em" };
@@ -264,14 +280,14 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   }));
 
   function renderResumo() {
-    const em = rows.filter(r => r.status === "emitida");
+    const em = base().filter(r => r.status === "emitida");
     const ar = em.filter(r => !r.recebida), rc = em.filter(r => r.recebida);
     const venc = ar.filter(r => { const p = prazo(r); return p.dias != null && p.dias < 0; });
-    const ae = rows.filter(r => r.status === "a_emitir");
+    const ae = base().filter(r => r.status === "a_emitir");
     const set = (id, l, unid) => { document.getElementById(id).textContent = brl(soma(l)); document.getElementById(id + "-n").textContent = l.length + " " + unid + (l.length === 1 ? "" : "s"); };
     set("k-areceber", ar, "nota"); set("k-vencido", venc, "nota"); set("k-recebido", rc, "nota"); set("k-aemitir", ae, "orçamento");
-    document.getElementById("k-pendente").textContent = brl(soma(rows.filter(r => r.status === "pendente")));
-    document.getElementById("k-conferir").textContent = brl(soma(rows.filter(r => r.status === "conferir")));
+    document.getElementById("k-pendente").textContent = brl(soma(base().filter(r => r.status === "pendente")));
+    document.getElementById("k-conferir").textContent = brl(soma(base().filter(r => r.status === "conferir")));
     document.getElementById("c-receb").textContent = ar.length;
     document.getElementById("c-div").textContent = avisos.length;
   }
@@ -283,7 +299,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
   }
 
   function renderReceb() {
-    const em = rows.filter(r => r.status === "emitida");
+    const em = base().filter(r => r.status === "emitida");
     const ar = em.filter(r => !r.recebida).sort((a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); });
     const rc = em.filter(r => r.recebida).sort((a, b) => String(b.recebidaEm).localeCompare(String(a.recebidaEm)) || String(b.mes).localeCompare(a.mes));
     const box = document.getElementById("l-areceber");
@@ -320,11 +336,11 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
 
   function renderMeses() {
     const box = document.getElementById("months");
-    const list = rows.filter(r => filtro === "todos" || r.status === filtro);
-    if (!list.length) { box.replaceChildren(el("div", "empty", rows.length ? "Nenhum orçamento com essa situação." : "Nenhum orçamento ainda. Use \"Adicionar orçamento\" abaixo.")); return; }
+    const list = base().filter(r => filtro === "todos" || r.status === filtro);
+    if (!list.length) { box.replaceChildren(el("div", "empty", base().length ? "Nenhum orçamento com essa situação." : "Nenhum orçamento ainda. Use \"Adicionar orçamento\" abaixo.")); return; }
     const months = [...new Set(list.map(r => r.mes))].sort().reverse();
     box.replaceChildren(...months.flatMap(m => {
-      const all = rows.filter(r => r.mes === m);
+      const all = base().filter(r => r.mes === m);
       const items = list.filter(r => r.mes === m).sort((a, b) => String(a.cod || "~").localeCompare(String(b.cod || "~"), "pt-BR", { numeric: true }));
       const h = el("div", "subhead"); h.append(el("h3", null, mesLabel(m)));
       const tot = el("div", "tot num"); tot.append(el("span", null, "Total " + brl(soma(all))));
@@ -358,7 +374,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     }));
   }
 
-  function renderAll() { renderResumo(); renderReceb(); renderMeses(); renderAvisos(); }
+  function renderAll() { renderSelMes(); renderResumo(); renderReceb(); renderMeses(); renderAvisos(); }
   const setConn = t => document.getElementById("conn").textContent = t;
 
   async function save(id, patch) {
