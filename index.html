@@ -73,6 +73,16 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .item { display: grid; grid-template-columns: minmax(0, 1fr) 130px 150px 190px; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .item .t { font-weight: 700; }
 .item .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.lote { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--fg); cursor: pointer; text-align: left; display: inline-flex; gap: 6px; align-items: baseline; }
+.lote .seta { color: var(--accent); font-size: 12px; transition: transform .15s; display: inline-block; }
+.lote[aria-expanded="true"] .seta { transform: rotate(90deg); }
+.lote .qt { font-size: 12px; font-weight: 600; color: var(--accent); }
+.sub { margin: 8px 0 2px; padding: 4px 0 4px 12px; border-left: 2px solid var(--line); display: grid; gap: 4px; font-size: 13px; }
+.sub div { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 8px; }
+.sub .nfn { font-family: var(--font-num); color: var(--muted); }
+.sub .vv { font-family: var(--font-num); text-align: right; }
+.sub .tot { border-top: 1px solid var(--line); padding-top: 4px; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .lote .seta { transition: none; } }
 .item .val { font-family: var(--font-num); font-weight: 600; text-align: right; }
 .item .act { display: flex; justify-content: flex-end; }
 @media (max-width: 720px) {
@@ -252,7 +262,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     selMes.value = mesSel;
   }
 
-  const toRow = r => ({ _id: r.id, mes: r.mes, cod: r.cod, desc: r.descricao, valor: Number(r.valor), status: r.status, nf: r.nf, obs: r.obs, alerta: r.alerta, recebida: r.recebida, recebidaEm: r.recebida_em || "", emitidaEm: r.emitida_em || "" });
+  const toRow = r => ({ _id: r.id, mes: r.mes, cod: r.cod, desc: r.descricao, valor: Number(r.valor), status: r.status, nf: r.nf, obs: r.obs, alerta: r.alerta, recebida: r.recebida, recebidaEm: r.recebida_em || "", emitidaEm: r.emitida_em || "", itens: Array.isArray(r.itens) ? r.itens : [] });
   const COLS = { desc: "descricao", recebidaEm: "recebida_em", emitidaEm: "emitida_em" };
   const toDb = p => { const o = {}; for (const k in p) o[COLS[k] || k] = ((k === "recebidaEm" || k === "emitidaEm") && !p[k]) ? null : p[k]; return o; };
 
@@ -298,6 +308,20 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     return i;
   }
 
+  const abertos = new Set();
+  // título do orçamento; lotes (com itens) abrem a lista de notas com o valor de cada uma
+  function titulo(r, tcls) {
+    const box = el("div");
+    if (!r.itens.length) { box.append(el("div", tcls, r.desc)); return box; }
+    const b = el("button", "lote"); b.type = "button"; b.setAttribute("aria-expanded", abertos.has(r._id) ? "true" : "false");
+    b.append(el("span", "seta", "▶"), el("span", null, r.desc), el("span", "qt", "ver notas"));
+    const sub = el("div", "sub"); sub.hidden = !abertos.has(r._id);
+    r.itens.forEach(i => { const l = el("div"); l.append(el("span", "nfn", i.nf ? "NF " + i.nf : "–"), el("span", null, i.desc || ""), el("span", "vv", brl(i.valor))); sub.append(l); });
+    const t = soma(r.itens), lt = el("div", "tot"); lt.append(el("span"), el("span", null, Math.abs(t - r.valor) < 0.005 ? "Total (confere)" : "Total (difere do lote: " + brl(r.valor) + ")"), el("span", "vv", brl(t)));
+    sub.append(lt);
+    b.addEventListener("click", () => { const open = sub.hidden; sub.hidden = !open; b.setAttribute("aria-expanded", open ? "true" : "false"); open ? abertos.add(r._id) : abertos.delete(r._id); });
+    box.append(b); box.sub = sub; return box;
+  }
   function renderReceb() {
     const em = base().filter(r => r.status === "emitida");
     const ar = em.filter(r => !r.recebida).sort((a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); });
@@ -306,7 +330,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     if (!ar.length) box.replaceChildren(el("div", "empty", "Nenhuma nota emitida esperando pagamento."));
     else box.replaceChildren(...ar.map(r => {
       const p = prazo(r), it = el("div", "item");
-      const a = el("div"); a.append(el("div", "t", r.desc), el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : "")));
+      const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
       const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
       const d = el("div", "d");
       if (p.prev) d.textContent = "Emissão " + fmt(parse(r.emitidaEm)) + " · previsão " + fmt(p.prev);
@@ -323,7 +347,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
     if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você marcar uma nota como recebida, ela aparece aqui."));
     else lb.replaceChildren(...rc.map(r => {
       const it = el("div", "item");
-      const a = el("div"); a.append(el("div", "t", r.desc), el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : "")));
+      const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
       const w = el("div", "when"); w.append(el("span", "badge b-ok", "Recebida"));
       const d = el("div", "d"); d.textContent = "em "; d.append(dataInput(r, "recebidaEm", "Data do recebimento")); w.append(d);
       const v = el("div", "val", brl(r.valor));
@@ -349,7 +373,7 @@ form.add label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); 
       return [h, ...items.map(r => {
         const row = el("div", "row");
         row.append(el("div", "cod", r.cod || "–"));
-        const d = el("div"); d.append(el("div", "t", r.desc));
+        const d = titulo(r, "t"); if (d.sub) d.append(d.sub);
         if (r.obs) d.append(el("div", "obs" + (r.alerta ? " alert" : ""), r.obs));
         if (r.status === "emitida") { const e = el("div", "em"); e.append("Emissão", dataInput(r, "emitidaEm", "Data de emissão")); if (r.recebida) e.append(el("span", "badge b-ok", "Recebida")); d.append(e); }
         row.append(d, el("div", "val", brl(r.valor)));
