@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Controle de Notas ARBRACOM</title>
+<title>ARBRACOM · Controle de Notas</title>
 <meta name="theme-color" content="#1d5f86">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Notas ARBRACOM">
+<meta name="apple-mobile-web-app-title" content="ARBRACOM">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -46,20 +46,45 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .status { font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
 .link { background: none; border: 0; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; }
 
-/* resumo */
-.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
-.summary > div { padding: 16px 16px 16px 0; display: grid; gap: 4px; min-width: 0; }
-.summary > div + div { padding-left: 16px; border-left: 1px solid var(--line); }
-.summary .v { font-family: var(--font-num); font-size: 22px; font-weight: 600; overflow-wrap: anywhere; }
-.summary .n { font-size: 12px; color: var(--muted); }
-.v.bad { color: var(--bad); } .v.ok { color: var(--ok); } .v.todo { color: var(--todo); }
-.minor { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: -16px; }
-.minor b { color: var(--fg); font-family: var(--font-num); font-weight: 600; }
-@media (max-width: 720px) {
-  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .summary > div:nth-child(3) { padding-left: 0; border-left: 0; }
-  .summary > div:nth-child(n+3) { border-top: 1px solid var(--line); }
-}
+/* marca */
+.marca { display: flex; align-items: center; gap: 14px; min-width: 0; flex-wrap: wrap; }
+.logo { background: #ffffff; border-radius: 10px; padding: 6px 10px; display: grid; place-items: center; box-shadow: 0 0 0 1px var(--line); flex: none; }
+.logo img { display: block; width: 190px; max-width: 100%; height: auto; }
+.marca p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+#login .logo { justify-self: start; display: inline-grid; margin-bottom: 14px; }
+
+/* caminho do dinheiro: 3 etapas */
+.sec-t { font-size: 17px; font-weight: 800; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); font-size: 14px; max-width: 65ch; }
+.caminho { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.etapa { background: var(--soft); border-radius: 12px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.etapa .passo { font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.etapa .passo i { font-style: normal; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--c-soft); color: var(--c); font-size: 12px; }
+.etapa .nome { font-size: 16px; font-weight: 800; }
+.etapa .v { font-family: var(--font-num); font-size: 24px; font-weight: 600; color: var(--c); overflow-wrap: anywhere; }
+.etapa .q { font-size: 13px; color: var(--muted); }
+.etapa .exp { font-size: 13px; margin-top: 4px; }
+.etapa .alerta { font-size: 13px; font-weight: 700; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 5px 8px; justify-self: start; }
+.e1 { --c: var(--todo); --c-soft: var(--todo-soft); }
+.e2 { --c: var(--accent); --c-soft: var(--accent-soft); }
+.e3 { --c: var(--ok); --c-soft: var(--ok-soft); }
+.barra { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin-top: 12px; background: var(--soft); }
+.barra span { display: block; height: 100%; }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.legenda b { color: var(--fg); }
+@media (max-width: 720px) { .caminho { grid-template-columns: 1fr; } .etapa .v { font-size: 21px; } .logo img { width: 140px; } }
+
+/* precisa da sua atenção */
+.atencao { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.atencao .cab { padding: 12px 16px; background: var(--bad-soft); color: var(--bad); font-weight: 800; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.atencao.tudo-ok .cab { background: var(--ok-soft); color: var(--ok); }
+.at { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.at:hover { background: var(--soft); }
+.at .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.at .t { font-weight: 700; }
+.at .s { font-size: 13px; color: var(--muted); }
+.at .val { font-family: var(--font-num); font-weight: 600; text-align: right; }
+.tabdesc { font-size: 13px; color: var(--muted); margin: 10px 0 2px; }
 
 /* abas */
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
@@ -90,9 +115,6 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
   .item > :nth-child(1) { grid-area: t; } .item .when { grid-area: w; } .item .val { grid-area: v; } .item .act { grid-area: a; align-self: end; }
   .item .btn { padding: 8px 10px; }
   .tab { padding: 10px 8px; font-size: 13.5px; }
-  .summary .v { font-size: 17px; }
-  .summary > div { padding-right: 8px; }
-  .summary > div + div { padding-left: 12px; }
 }
 .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
 .b-bad { background: var(--bad-soft); color: var(--bad); }
@@ -187,8 +209,9 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
 <body>
 
 <div id="login">
-  <div class="eyebrow">Swift fora da garantia · ARBRACOM</div>
-  <h1>Controle de notas</h1>
+  <div class="logo"><img src="logo-arbracom.png" alt="ARBRACOM Serviços em Refrigeração" width="190" height="55"></div>
+  <h1>ARBRACOM · Controle de Notas</h1>
+  <div class="marca"><p>Serviços Swift fora da garantia</p></div>
   <form id="loginform">
     <label for="l-email">E-mail<input id="l-email" type="email" autocomplete="username" required></label>
     <label for="l-senha">Senha<input id="l-senha" type="password" autocomplete="current-password" required></label>
@@ -199,9 +222,12 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
 
 <div class="wrap" id="app" hidden>
   <header>
-    <div>
-      <div class="eyebrow">Swift fora da garantia · ARBRACOM</div>
-      <h1>Controle de notas</h1>
+    <div class="marca">
+      <div class="logo"><img src="logo-arbracom.png" alt="ARBRACOM Serviços em Refrigeração" width="190" height="55"></div>
+      <div>
+        <h1>ARBRACOM · Controle de Notas</h1>
+        <p>Serviços Swift fora da garantia</p>
+      </div>
     </div>
     <div class="hright">
       <label class="mesfiltro" for="mes-sel"><span class="eyebrow">Mês</span><select id="mes-sel"><option value="">Todos os meses</option></select></label>
@@ -210,39 +236,63 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
   </header>
 
   <section>
-    <div class="summary">
-      <div><span class="eyebrow">A receber</span><span class="v" id="k-areceber">—</span><span class="n" id="k-areceber-n"></span></div>
-      <div><span class="eyebrow">Vencido</span><span class="v bad" id="k-vencido">—</span><span class="n" id="k-vencido-n"></span></div>
-      <div><span class="eyebrow">Recebido</span><span class="v ok" id="k-recebido">—</span><span class="n" id="k-recebido-n"></span></div>
-      <div><span class="eyebrow">Falta tirar nota</span><span class="v todo" id="k-aemitir">—</span><span class="n" id="k-aemitir-n"></span></div>
+    <h2 class="sec-t" style="text-transform:none;letter-spacing:0;color:var(--fg)">Onde está o dinheiro</h2>
+    <p class="lead">Todo serviço passa por três etapas: vira nota, a Swift paga em até 40 dias, e o dinheiro entra.</p>
+    <div class="caminho">
+      <div class="etapa e1">
+        <div class="passo"><i>1</i>Etapa 1</div>
+        <div class="nome">Nota a emitir</div>
+        <div class="v" id="k-aemitir">—</div>
+        <div class="q" id="k-aemitir-n"></div>
+        <div class="exp">Serviço feito e orçamento pronto, mas a nota ainda não foi tirada.</div>
+      </div>
+      <div class="etapa e2">
+        <div class="passo"><i>2</i>Etapa 2</div>
+        <div class="nome">Aguardando pagamento</div>
+        <div class="v" id="k-areceber">—</div>
+        <div class="q" id="k-areceber-n"></div>
+        <div class="exp">Nota já emitida. A Swift paga até 40 dias depois da emissão.</div>
+        <div class="alerta" id="k-vencido" hidden></div>
+      </div>
+      <div class="etapa e3">
+        <div class="passo"><i>3</i>Etapa 3</div>
+        <div class="nome">Recebido</div>
+        <div class="v" id="k-recebido">—</div>
+        <div class="q" id="k-recebido-n"></div>
+        <div class="exp">A Swift já pagou. Dinheiro na conta.</div>
+      </div>
     </div>
+    <div class="barra" id="barra" aria-hidden="true"></div>
+    <div class="legenda" id="legenda"></div>
   </section>
-  <div class="minor">
-    <span>Pendente, pedido cobrado: <b id="k-pendente">—</b></span>
-    <span>A conferir: <b id="k-conferir">—</b></span>
-    <span>Prazo de recebimento: <b>40 dias</b> após a emissão</span>
-  </div>
+
+  <section class="atencao" id="atencao">
+    <div class="cab"><span id="at-tit">Precisa da sua atenção</span><span id="at-n"></span></div>
+    <div id="at-lista"></div>
+  </section>
 
   <section>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tab-receb" aria-selected="true" data-v="receb">Recebimentos<span class="count" id="c-receb">0</span></button>
-      <button class="tab" role="tab" id="tab-meses" aria-selected="false" data-v="meses">Por mês</button>
-      <button class="tab" role="tab" id="tab-serv" aria-selected="false" data-v="serv">Serviços<span class="count" id="c-serv">0</span></button>
-      <button class="tab" role="tab" id="tab-div" aria-selected="false" data-v="div">Divergências<span class="count" id="c-div">0</span></button>
+      <button class="tab" role="tab" id="tab-receb" aria-selected="true" data-v="receb">A receber<span class="count" id="c-receb">0</span></button>
+      <button class="tab" role="tab" id="tab-meses" aria-selected="false" data-v="meses">Notas do mês</button>
+      <button class="tab" role="tab" id="tab-serv" aria-selected="false" data-v="serv">Chamados<span class="count" id="c-serv">0</span></button>
+      <button class="tab" role="tab" id="tab-div" aria-selected="false" data-v="div">Avisos<span class="count" id="c-div">0</span></button>
     </div>
 
     <div id="v-receb">
+      <p class="tabdesc">Notas emitidas que a Swift ainda não pagou, das mais urgentes para as mais novas. Quando o dinheiro cair, toque em "Já recebi".</p>
       <div class="list" id="l-areceber"></div>
       <div class="subhead"><h3>Recebidas</h3><div class="tot num" id="t-recebidas"></div></div>
       <div class="list" id="l-recebidas"></div>
     </div>
 
     <div id="v-meses" hidden>
+      <p class="tabdesc">Todos os orçamentos, separados por mês. Aqui você muda a situação de cada um e anota o número da nota.</p>
       <div class="filters" id="filters">
-        <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
+        <button class="chip" data-f="todos" aria-pressed="true">Todas</button>
         <button class="chip" data-f="emitida" aria-pressed="false">Emitidas</button>
-        <button class="chip" data-f="pendente" aria-pressed="false">Pendentes</button>
-        <button class="chip" data-f="a_emitir" aria-pressed="false">Falta tirar</button>
+        <button class="chip" data-f="pendente" aria-pressed="false">Cobrado sem nota</button>
+        <button class="chip" data-f="a_emitir" aria-pressed="false">Nota a emitir</button>
         <button class="chip" data-f="conferir" aria-pressed="false">A conferir</button>
       </div>
       <div id="months"></div>
@@ -253,7 +303,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
           <label for="f-cod">Nº<input id="f-cod" placeholder="1.1"></label>
           <label for="f-desc">Descrição<input id="f-desc" required placeholder="Corretiva refrigeração L.Física GO e DF"></label>
           <label for="f-valor">Valor (R$)<input id="f-valor" required inputmode="decimal" placeholder="12.345,67"></label>
-          <label for="f-status">Situação<select id="f-status"><option value="a_emitir">Falta tirar</option><option value="pendente">Pendente · pedido cobrado</option><option value="emitida">Emitida</option><option value="conferir">A conferir</option></select></label>
+          <label for="f-status">Situação<select id="f-status"><option value="a_emitir">Nota a emitir</option><option value="pendente">Pedido cobrado sem nota</option><option value="emitida">Emitida</option><option value="conferir">A conferir</option></select></label>
           <button class="btn btn-primary" type="submit">Adicionar</button>
         </form>
         <div class="toast" id="toast"></div>
@@ -261,7 +311,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     </div>
 
     <div id="v-serv" hidden>
-      <div class="subhead"><h3 id="serv-tit">Serviços</h3><div class="tot num" id="t-serv"></div></div>
+      <div class="subhead"><h3 id="serv-tit">Chamados</h3><div class="tot num" id="t-serv"></div></div>
       <div class="servbar"><button class="btn btn-primary" type="button" id="serv-novo">Novo chamado</button><button class="btn btn-ghost" type="button" id="serv-copiar">Copiar texto do mês</button><span class="toast" id="serv-toast"></span></div>
       <form class="serv" id="servform" hidden>
         <div class="sgrid">
@@ -288,6 +338,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     </div>
 
     <div id="v-div" hidden>
+      <p class="tabdesc">Valores que não batem ou que precisam ser conferidos.</p>
       <ul class="avisos" id="avisos"></ul>
     </div>
   </section>
@@ -298,7 +349,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
 <script>
 (function () {
   const PRAZO = 40;
-  const ST = { emitida: "Emitida", pendente: "Pendente", a_emitir: "Falta tirar", conferir: "A conferir" };
+  const ST = { emitida: "Emitida", pendente: "Cobrado sem nota", a_emitir: "Nota a emitir", conferir: "A conferir" };
   const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const brl = v => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const soma = l => l.reduce((s, r) => s + (Number(r.valor) || 0), 0);
@@ -330,10 +381,10 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     const em = parse(r.emitidaEm);
     if (!em) return { prev: null, dias: null, cls: "b-muted", txt: "Sem data de emissão" };
     const prev = addDias(em, PRAZO), dias = Math.round((prev - hoje()) / 864e5);
-    if (dias < 0) return { prev, dias, cls: "b-bad", txt: "Vencida há " + (-dias) + (dias === -1 ? " dia" : " dias") };
+    if (dias < 0) return { prev, dias, cls: "b-bad", txt: "Atrasada " + (-dias) + (dias === -1 ? " dia" : " dias") };
     if (dias === 0) return { prev, dias, cls: "b-warn", txt: "Vence hoje" };
-    if (dias <= 7) return { prev, dias, cls: "b-warn", txt: "Vence em " + dias + (dias === 1 ? " dia" : " dias") };
-    return { prev, dias, cls: "b-ok", txt: "No prazo · " + dias + " dias" };
+    if (dias <= 7) return { prev, dias, cls: "b-warn", txt: "Falta" + (dias === 1 ? " 1 dia" : "m " + dias + " dias") };
+    return { prev, dias, cls: "b-ok", txt: "Faltam " + dias + " dias" };
   }
 
   // abas
@@ -348,15 +399,42 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     renderMeses();
   }));
 
+  function irPara(v) { const t = document.querySelector('.tab[data-v="' + v + '"]'); if (t) { t.click(); t.scrollIntoView({ behavior: "smooth", block: "start" }); } }
   function renderResumo() {
     const em = base().filter(r => r.status === "emitida");
     const ar = em.filter(r => !r.recebida), rc = em.filter(r => r.recebida);
     const venc = ar.filter(r => { const p = prazo(r); return p.dias != null && p.dias < 0; });
+    const semData = ar.filter(r => !r.emitidaEm);
     const ae = base().filter(r => r.status === "a_emitir");
+    const pend = base().filter(r => r.status === "pendente"), conf = base().filter(r => r.status === "conferir");
     const set = (id, l, unid) => { document.getElementById(id).textContent = brl(soma(l)); document.getElementById(id + "-n").textContent = l.length + " " + unid + (l.length === 1 ? "" : "s"); };
-    set("k-areceber", ar, "nota"); set("k-vencido", venc, "nota"); set("k-recebido", rc, "nota"); set("k-aemitir", ae, "orçamento");
-    document.getElementById("k-pendente").textContent = brl(soma(base().filter(r => r.status === "pendente")));
-    document.getElementById("k-conferir").textContent = brl(soma(base().filter(r => r.status === "conferir")));
+    set("k-areceber", ar, "nota"); set("k-recebido", rc, "nota"); set("k-aemitir", ae, "orçamento");
+    const kv = document.getElementById("k-vencido"); kv.hidden = !venc.length; kv.textContent = brl(soma(venc)) + " atrasado";
+    const tot = soma(ae) + soma(ar) + soma(rc), pc = v => tot ? v / tot * 100 : 0;
+    const barra = document.getElementById("barra");
+    barra.replaceChildren(...[[ae, "--todo"], [ar, "--accent"], [rc, "--ok"]].map(([l, c]) => { const sp = el("span"); sp.style.width = pc(soma(l)) + "%"; sp.style.background = "var(" + c + ")"; return sp; }));
+    const lg = document.getElementById("legenda"); lg.replaceChildren();
+    const lt = el("span", null, "Total " + (mesSel ? "do mês" : "geral") + ": "); lt.append(el("b", "num", brl(tot)));
+    const lr = el("span", null, "Já recebido: "); lr.append(el("b", null, Math.round(pc(soma(rc))) + "%"));
+    lg.append(lt, lr);
+    // precisa da sua atenção
+    const its = [];
+    const plural = (n, a, b) => n + " " + (n === 1 ? a : b);
+    if (venc.length) its.push(["--bad", plural(venc.length, "nota passou do prazo de pagamento", "notas passaram do prazo de pagamento"), venc.slice(0, 3).map(r => (r.nf ? "NF " + r.nf + " · " : "") + r.desc).join("; ") + ". Cobrar a Swift.", soma(venc), "receb"]);
+    if (pend.length) its.push(["--warn", plural(pend.length, "pedido cobrado ainda sem nota", "pedidos cobrados ainda sem nota"), "A Swift já pediu, falta emitir a nota.", soma(pend), "meses", "pendente"]);
+    if (conf.length) its.push(["--todo", plural(conf.length, "valor para conferir", "valores para conferir"), "O valor do orçamento precisa ser conferido.", soma(conf), "meses", "conferir"]);
+    if (semData.length) its.push(["--muted", plural(semData.length, "nota sem data de emissão", "notas sem data de emissão"), "Sem a data não dá para saber quando vence.", soma(semData), "receb"]);
+    const box = document.getElementById("atencao");
+    box.classList.toggle("tudo-ok", !its.length);
+    document.getElementById("at-tit").textContent = its.length ? "Precisa da sua atenção" : "Tudo em dia, nada precisa da sua atenção";
+    document.getElementById("at-n").textContent = its.length ? plural(its.length, "item", "itens") : "";
+    document.getElementById("at-lista").replaceChildren(...its.map(([c, t, sub, v, aba, f]) => {
+      const b = el("button", "at"); b.type = "button"; b.style.setProperty("--c", "var(" + c + ")");
+      const tx = el("div"); tx.append(el("div", "t", t), el("div", "s", sub));
+      b.append(el("span", "dot"), tx, el("span", "val", brl(v)));
+      b.addEventListener("click", () => { if (f) { const ch = document.querySelector('#filters .chip[data-f="' + f + '"]'); if (ch) ch.click(); } irPara(aba); });
+      return b;
+    }));
     document.getElementById("c-receb").textContent = ar.length;
     document.getElementById("c-div").textContent = avisos.length;
   }
@@ -392,18 +470,18 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
       const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
       const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
       const d = el("div", "d");
-      if (p.prev) d.textContent = "Emissão " + fmt(parse(r.emitidaEm)) + " · previsão " + fmt(p.prev);
-      else { d.textContent = "Emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
+      if (p.prev) d.textContent = "Emitida " + fmt(parse(r.emitidaEm)) + " · pagar até " + fmt(p.prev);
+      else { d.textContent = "Data de emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
       w.append(d);
       const v = el("div", "val", brl(r.valor));
-      const act = el("div", "act"); const b = el("button", "btn btn-primary", "Marcar recebida"); b.type = "button";
+      const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já recebi"); b.type = "button";
       b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: true, recebidaEm: iso(hoje()) }); });
       act.append(b);
       it.append(a, w, v, act); return it;
     }));
     document.getElementById("t-recebidas").textContent = rc.length ? rc.length + (rc.length === 1 ? " nota · " : " notas · ") + brl(soma(rc)) : "";
     const lb = document.getElementById("l-recebidas");
-    if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você marcar uma nota como recebida, ela aparece aqui."));
+    if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você tocar em \"Já recebi\" numa nota, ela aparece aqui."));
     else lb.replaceChildren(...rc.map(r => {
       const it = el("div", "item");
       const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
@@ -427,7 +505,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
       const items = list.filter(r => r.mes === m).sort((a, b) => String(a.cod || "~").localeCompare(String(b.cod || "~"), "pt-BR", { numeric: true }));
       const h = el("div", "subhead"); h.append(el("h3", null, mesLabel(m)));
       const tot = el("div", "tot num"); tot.append(el("span", null, "Total " + brl(soma(all))));
-      const fa = soma(all.filter(r => r.status === "a_emitir")); if (fa) tot.append(el("span", null, "Falta tirar " + brl(fa)));
+      const fa = soma(all.filter(r => r.status === "a_emitir")); if (fa) tot.append(el("span", null, "Nota a emitir " + brl(fa)));
       h.append(tot);
       return [h, ...items.map(r => {
         const row = el("div", "row");
@@ -564,7 +642,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
   function renderServ() {
     const l = servsMes();
     fS("c-serv").textContent = l.length;
-    fS("serv-tit").textContent = mesSel ? "Serviços de " + mesLabel(mesSel) : "Serviços (todos os meses)";
+    fS("serv-tit").textContent = mesSel ? "Chamados de " + mesLabel(mesSel) : "Chamados (todos os meses)";
     fS("t-serv").textContent = l.length ? l.length + (l.length === 1 ? " chamado · " : " chamados · ") + brl(l.reduce((t, s) => t + totalServ(s), 0)) : "";
     const uniq = k => [...new Set(servs.map(s => s[k]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
     fS("dl-loja").replaceChildren(...uniq("loja").map(v => { const o = el("option"); o.value = v; return o; }));
