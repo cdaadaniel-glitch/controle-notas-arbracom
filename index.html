@@ -57,7 +57,18 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .sec-t { font-size: 17px; font-weight: 800; margin: 0 0 4px; }
 .lead { margin: 0 0 14px; color: var(--muted); font-size: 14px; max-width: 65ch; }
 .caminho { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.etapa { background: var(--soft); border-radius: 12px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.etapa { background: var(--soft); border-radius: 12px; padding: 16px; display: grid; gap: 6px; align-content: start; border: 2px solid transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%; }
+.etapa:hover { border-color: var(--line); }
+.etapa[aria-expanded="true"] { border-color: var(--c); background: var(--bg); }
+.etapa .ver { font-size: 13px; font-weight: 700; color: var(--c); margin-top: 4px; }
+.etapa .ver::after { content: " ›"; }
+.etapa[aria-expanded="true"] .ver::after { content: " ⌄"; }
+.etapa-lista { margin-top: 16px; border: 2px solid var(--c); border-radius: 12px; padding: 4px 16px 8px; }
+.etapa-lista .el-cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; flex-wrap: wrap; }
+.etapa-lista h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--c); }
+.etapa-lista .tot { font-size: 12.5px; color: var(--muted); }
+.etapa-lista .item:last-child { border-bottom: 0; }
+.b-todo { background: var(--todo-soft); color: var(--todo); }
 .etapa .passo { font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .etapa .passo i { font-style: normal; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--c-soft); color: var(--c); font-size: 12px; }
 .etapa .nome { font-size: 16px; font-weight: 800; }
@@ -237,33 +248,41 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
 
   <section>
     <h2 class="sec-t" style="text-transform:none;letter-spacing:0;color:var(--fg)">Onde está o dinheiro</h2>
-    <p class="lead">Todo serviço passa por três etapas: vira nota, a Swift paga em até 40 dias, e o dinheiro entra.</p>
+    <p class="lead">Todo serviço passa por três etapas: vira nota, a Swift paga em até 40 dias, e o dinheiro entra. Toque numa etapa para ver as notas dela.</p>
     <div class="caminho">
-      <div class="etapa e1">
+      <button class="etapa e1" type="button" data-e="e1" aria-expanded="false" aria-controls="etapa-lista">
         <div class="passo"><i>1</i>Etapa 1</div>
         <div class="nome">Nota a emitir</div>
         <div class="v" id="k-aemitir">—</div>
         <div class="q" id="k-aemitir-n"></div>
         <div class="exp">Serviço feito e orçamento pronto, mas a nota ainda não foi tirada.</div>
-      </div>
-      <div class="etapa e2">
+        <span class="ver">Ver orçamentos</span>
+      </button>
+      <button class="etapa e2" type="button" data-e="e2" aria-expanded="false" aria-controls="etapa-lista">
         <div class="passo"><i>2</i>Etapa 2</div>
         <div class="nome">Aguardando pagamento</div>
         <div class="v" id="k-areceber">—</div>
         <div class="q" id="k-areceber-n"></div>
         <div class="exp">Nota já emitida. A Swift paga até 40 dias depois da emissão.</div>
         <div class="alerta" id="k-vencido" hidden></div>
-      </div>
-      <div class="etapa e3">
+        <span class="ver">Ver notas</span>
+      </button>
+      <button class="etapa e3" type="button" data-e="e3" aria-expanded="false" aria-controls="etapa-lista">
         <div class="passo"><i>3</i>Etapa 3</div>
         <div class="nome">Recebido</div>
         <div class="v" id="k-recebido">—</div>
         <div class="q" id="k-recebido-n"></div>
         <div class="exp">A Swift já pagou. Dinheiro na conta.</div>
-      </div>
+        <span class="ver">Ver notas</span>
+      </button>
     </div>
     <div class="barra" id="barra" aria-hidden="true"></div>
     <div class="legenda" id="legenda"></div>
+    <div class="etapa-lista" id="etapa-lista" hidden>
+      <div class="el-cab"><div><h3 id="etapa-tit"></h3><div class="tot num" id="etapa-tot"></div></div><button class="btn btn-ghost" type="button" id="etapa-fechar">Fechar</button></div>
+      <p class="tabdesc" id="etapa-dica"></p>
+      <div class="list" id="etapa-itens"></div>
+    </div>
   </section>
 
   <section class="atencao" id="atencao">
@@ -459,40 +478,73 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     b.addEventListener("click", () => { const open = sub.hidden; sub.hidden = !open; b.setAttribute("aria-expanded", open ? "true" : "false"); open ? abertos.add(r._id) : abertos.delete(r._id); });
     box.append(b); box.sub = sub; return box;
   }
+  const ordAR = (a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); };
+  const ordRC = (a, b) => String(b.recebidaEm).localeCompare(String(a.recebidaEm)) || String(b.mes).localeCompare(a.mes);
+  function cabItem(r) { const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.cod ? " · orç. " + r.cod : "") + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub); return a; }
+  function itemAR(r) {
+    const p = prazo(r), it = el("div", "item");
+    const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
+    const d = el("div", "d");
+    if (p.prev) d.textContent = "Emitida " + fmt(parse(r.emitidaEm)) + " · pagar até " + fmt(p.prev);
+    else { d.textContent = "Data de emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
+    w.append(d);
+    const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já recebi"); b.type = "button";
+    b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: true, recebidaEm: iso(hoje()) }); });
+    act.append(b);
+    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
+  }
+  function itemRC(r) {
+    const it = el("div", "item");
+    const w = el("div", "when"); w.append(el("span", "badge b-ok", "Recebida"));
+    const d = el("div", "d"); d.textContent = "em "; d.append(dataInput(r, "recebidaEm", "Data do recebimento")); w.append(d);
+    const act = el("div", "act"); const b = el("button", "btn btn-ghost", "Desfazer"); b.type = "button";
+    b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: false, recebidaEm: "" }); });
+    act.append(b);
+    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
+  }
+  function itemAE(r) {
+    const it = el("div", "item");
+    const w = el("div", "when"); w.append(el("span", "badge b-todo", "Nota a emitir"));
+    const d = el("div", "d"); const inp = el("input", "nf"); inp.id = "ae-nf-" + r._id; inp.value = r.nf || ""; inp.placeholder = "nº NF"; inp.setAttribute("aria-label", "Número da NF de " + (r.desc || ""));
+    d.append("NF ", inp); w.append(d);
+    const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já emiti"); b.type = "button";
+    b.addEventListener("click", () => { b.disabled = true; const pt = { status: "emitida", emitidaEm: r.emitidaEm || iso(hoje()) }; if (inp.value.trim()) pt.nf = inp.value.trim(); save(r._id, pt); });
+    act.append(b);
+    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
+  }
   function renderReceb() {
     const em = base().filter(r => r.status === "emitida");
-    const ar = em.filter(r => !r.recebida).sort((a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); });
-    const rc = em.filter(r => r.recebida).sort((a, b) => String(b.recebidaEm).localeCompare(String(a.recebidaEm)) || String(b.mes).localeCompare(a.mes));
+    const ar = em.filter(r => !r.recebida).sort(ordAR), rc = em.filter(r => r.recebida).sort(ordRC);
     const box = document.getElementById("l-areceber");
     if (!ar.length) box.replaceChildren(el("div", "empty", "Nenhuma nota emitida esperando pagamento."));
-    else box.replaceChildren(...ar.map(r => {
-      const p = prazo(r), it = el("div", "item");
-      const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
-      const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
-      const d = el("div", "d");
-      if (p.prev) d.textContent = "Emitida " + fmt(parse(r.emitidaEm)) + " · pagar até " + fmt(p.prev);
-      else { d.textContent = "Data de emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
-      w.append(d);
-      const v = el("div", "val", brl(r.valor));
-      const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já recebi"); b.type = "button";
-      b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: true, recebidaEm: iso(hoje()) }); });
-      act.append(b);
-      it.append(a, w, v, act); return it;
-    }));
+    else box.replaceChildren(...ar.map(itemAR));
     document.getElementById("t-recebidas").textContent = rc.length ? rc.length + (rc.length === 1 ? " nota · " : " notas · ") + brl(soma(rc)) : "";
     const lb = document.getElementById("l-recebidas");
     if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você tocar em \"Já recebi\" numa nota, ela aparece aqui."));
-    else lb.replaceChildren(...rc.map(r => {
-      const it = el("div", "item");
-      const a = titulo(r, "t"); a.append(el("div", "s", mesLabel(r.mes) + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub);
-      const w = el("div", "when"); w.append(el("span", "badge b-ok", "Recebida"));
-      const d = el("div", "d"); d.textContent = "em "; d.append(dataInput(r, "recebidaEm", "Data do recebimento")); w.append(d);
-      const v = el("div", "val", brl(r.valor));
-      const act = el("div", "act"); const b = el("button", "btn btn-ghost", "Desfazer"); b.type = "button";
-      b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: false, recebidaEm: "" }); });
-      act.append(b);
-      it.append(a, w, v, act); return it;
-    }));
+    else lb.replaceChildren(...rc.map(itemRC));
+  }
+
+  // tocar numa etapa abre a lista só das notas dela
+  let etapaSel = "";
+  const ETAPAS = {
+    e1: { tit: "Nota a emitir", vazio: "Nenhum orçamento esperando nota.", dica: "Quando tirar a nota, digite o número e toque em \"Já emiti\". Ela passa para a etapa 2.", lista: () => base().filter(r => r.status === "a_emitir").sort((a, b) => String(b.mes).localeCompare(a.mes)), item: itemAE },
+    e2: { tit: "Aguardando pagamento", vazio: "Nenhuma nota esperando pagamento.", dica: "Das mais urgentes para as mais novas. Quando o dinheiro cair, toque em \"Já recebi\".", lista: () => base().filter(r => r.status === "emitida" && !r.recebida).sort(ordAR), item: itemAR },
+    e3: { tit: "Recebido", vazio: "Nenhuma nota recebida ainda.", dica: "Notas que a Swift já pagou, das mais recentes para as mais antigas.", lista: () => base().filter(r => r.status === "emitida" && r.recebida).sort(ordRC), item: itemRC },
+  };
+  document.querySelectorAll(".etapa[data-e]").forEach(b => b.addEventListener("click", () => {
+    etapaSel = etapaSel === b.dataset.e ? "" : b.dataset.e; renderEtapa();
+    if (etapaSel) document.getElementById("etapa-lista").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }));
+  document.getElementById("etapa-fechar").addEventListener("click", () => { etapaSel = ""; renderEtapa(); });
+  function renderEtapa() {
+    document.querySelectorAll(".etapa[data-e]").forEach(b => b.setAttribute("aria-expanded", b.dataset.e === etapaSel ? "true" : "false"));
+    const box = document.getElementById("etapa-lista"); box.hidden = !etapaSel; if (!etapaSel) return;
+    const E = ETAPAS[etapaSel], l = E.lista();
+    box.className = "etapa-lista " + etapaSel;
+    document.getElementById("etapa-tit").textContent = E.tit + (mesSel ? " · " + mesLabel(mesSel) : "");
+    document.getElementById("etapa-tot").textContent = l.length + (l.length === 1 ? " item · " : " itens · ") + brl(soma(l));
+    document.getElementById("etapa-dica").textContent = E.dica;
+    document.getElementById("etapa-itens").replaceChildren(...(l.length ? l.map(E.item) : [el("div", "empty", E.vazio)]));
   }
 
   function renderMeses() {
@@ -535,7 +587,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     }));
   }
 
-  function renderAll() { renderSelMes(); renderResumo(); renderReceb(); renderMeses(); renderServ(); renderAvisos(); }
+  function renderAll() { renderSelMes(); renderResumo(); renderEtapa(); renderReceb(); renderMeses(); renderServ(); renderAvisos(); }
   const setConn = t => document.getElementById("conn").textContent = t;
 
   async function save(id, patch) {
