@@ -85,6 +85,19 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .legenda b { color: var(--fg); }
 @media (max-width: 720px) { .caminho { grid-template-columns: 1fr; } .etapa .v { font-size: 21px; } .logo img { width: 140px; } }
 
+/* atualizar notas pelos PDFs */
+.imp { border: 2px solid var(--accent); border-radius: 12px; padding: 4px 16px 14px; }
+.imp .el-cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; flex-wrap: wrap; }
+.imp h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.imp .tot { font-size: 13px; color: var(--muted); }
+.ir { display: grid; grid-template-columns: minmax(0, 1fr) 120px minmax(0, 300px); gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ir .t { font-weight: 700; } .ir .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+.ir .val { font-family: var(--font-num); font-weight: 600; text-align: right; }
+.ir select { font: inherit; font-size: 13px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); width: 100%; min-width: 0; }
+.ir .ja { font-size: 13px; color: var(--ok); font-weight: 700; }
+.ir .ign { font-size: 13px; color: var(--muted); font-weight: 700; }
+@media (max-width: 720px) { .ir { grid-template-columns: minmax(0, 1fr) auto; } .ir > :nth-child(3) { grid-column: 1 / -1; } }
+
 /* precisa da sua atenção */
 .atencao { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .atencao .cab { padding: 12px 16px; background: var(--bad-soft); color: var(--bad); font-weight: 800; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -242,6 +255,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     </div>
     <div class="hright">
       <label class="mesfiltro" for="mes-sel"><span class="eyebrow">Mês</span><select id="mes-sel"><option value="">Todos os meses</option></select></label>
+      <button class="btn btn-primary" type="button" id="imp-btn">Atualizar notas</button><input type="file" id="imp-arq" accept="application/pdf,.pdf" multiple hidden>
       <div class="status"><span id="conn">Carregando…</span><button class="link" id="sair" type="button">Sair</button></div>
     </div>
   </header>
@@ -283,6 +297,13 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
       <p class="tabdesc" id="etapa-dica"></p>
       <div class="list" id="etapa-itens"></div>
     </div>
+  </section>
+
+  <section class="imp" id="imp" hidden>
+    <div class="el-cab"><div><h3>Atualizar com as notas da pasta</h3><div class="tot" id="imp-res"></div></div><button class="btn btn-ghost" type="button" id="imp-fechar">Fechar</button></div>
+    <p class="tabdesc">O painel leu o número, o valor e a data de cada PDF. Confira para onde cada nota vai e toque em "Salvar". Nada é gravado antes disso.</p>
+    <div id="imp-lista"></div>
+    <div class="sfoot"><span class="toast" id="imp-toast"></span><span class="sbtns"><button class="btn btn-ghost" type="button" id="imp-mais">Escolher mais PDFs</button><button class="btn btn-primary" type="button" id="imp-salvar">Salvar</button></span></div>
   </section>
 
   <section class="atencao" id="atencao">
@@ -725,6 +746,134 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
       c.append(h, d); return c;
     }));
   }
+
+  // ===== Atualizar notas pelos PDFs da pasta =====
+  const MESN = { JANEIRO: 1, FEVEREIRO: 2, "MARÇO": 3, MARCO: 3, ABRIL: 4, MAIO: 5, JUNHO: 6, JULHO: 7, AGOSTO: 8, SETEMBRO: 9, OUTUBRO: 10, NOVEMBRO: 11, DEZEMBRO: 12 };
+  const nfNorm = x => String(x || "").trim().replace(/^0+(?=\d)/, "");
+  const mesmo = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
+  let impLista = [];
+  let pdfjsP = null;
+  function pdfjs() {
+    if (!pdfjsP) pdfjsP = new Promise((ok, erro) => {
+      const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      sc.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; ok(window.pdfjsLib); };
+      sc.onerror = () => erro(new Error("pdf.js")); document.head.append(sc);
+    });
+    return pdfjsP;
+  }
+  async function textoPdf(f) {
+    try {
+      const lib = await pdfjs(), doc = await lib.getDocument({ data: await f.arrayBuffer() }).promise;
+      const pg = await doc.getPage(1), tc = await pg.getTextContent();
+      return tc.items.map(i => i.str).join(" ");
+    } catch (e) { return ""; }
+  }
+  function lerNome(nome) {
+    const n = nome.replace(/\.pdf$/i, "");
+    const m = n.match(/^\s*NF\s*(\d+)/i); if (!m) return null;
+    const v = n.match(/R\$\s*([\d.]+,\d{2}|[\d.]+)\s*$/i) || n.match(/R\$\s*([\d.]+,\d{2})/i);
+    const valor = v ? Number(v[1].replace(/\./g, "").replace(",", ".")) : NaN;
+    const up = n.toUpperCase();
+    const mesNome = Object.keys(MESN).find(k => new RegExp("\\b" + k + "\\b").test(up));
+    let desc = n.replace(/^\s*NF\s*\d+\s*-?\s*/i, "").replace(/R\$.*$/i, "").replace(/ARBRACOM\s*-?\s*/i, "").replace(/[\s-]+$/, "").trim();
+    return { nf: nfNorm(m[1]), nfTxt: m[1], valor, desc, up, mesNome, cancelada: /CANCEL/.test(up) };
+  }
+  function tipoCod(up) { const t = /PE[ÇC]AS/.test(up) ? "3" : /CIVIL/.test(up) ? "2" : /REFRIG/.test(up) ? "1" : ""; const sub = /MEAT/.test(up) ? "3" : /VAREJO/.test(up) ? "2" : /F[IÍ]SICA/.test(up) ? "1" : ""; return [t, sub]; }
+  function jaNoPainel(x) {
+    return rows.find(r => (nfNorm(r.nf) === x.nf && mesmo(r.valor, x.valor)) || r.itens.some(i => nfNorm(i.nf) === x.nf && mesmo(i.valor, x.valor)));
+  }
+  function sugerir(x) {
+    const abertos = rows.filter(r => r.status !== "emitida");
+    const iguais = abertos.filter(r => mesmo(r.valor, x.valor));
+    if (iguais.length) { const noMes = iguais.filter(r => r.mes === x.mes); return (noMes[0] || iguais[0])._id; }
+    if (/PREVENTIVA|AHT|PO \d/i.test(x.up) && !/CORRETIVA|PE[ÇC]AS/.test(x.up)) return "novo";
+    const [t, sub] = tipoCod(x.up);
+    if (t) {
+      const c = abertos.filter(r => r.mes === x.mes && String(r.cod || "").startsWith(t) && r.valor > x.valor && (!sub || String(r.cod).replace(".", "").slice(1) === sub));
+      if (c.length === 1) return c[0]._id;
+    }
+    return "novo";
+  }
+  async function lerArquivos(files) {
+    const toast = document.getElementById("imp-toast"); toast.textContent = "Lendo " + files.length + (files.length === 1 ? " PDF…" : " PDFs…");
+    document.getElementById("imp").hidden = false;
+    for (const f of files) {
+      const x = lerNome(f.name);
+      if (!x || !isFinite(x.valor)) { impLista.push({ arquivo: f.name, invalido: true }); continue; }
+      if (impLista.some(o => o.nf === x.nf && mesmo(o.valor, x.valor))) continue;
+      const txt = await textoPdf(f);
+      const dm = txt.match(/(\d{2})\/(\d{2})\/(\d{4})\s+\d{2}:\d{2}(:\d{2})?/);
+      const em = dm ? dm[3] + "-" + dm[2] + "-" + dm[1] : iso(new Date(f.lastModified));
+      x.emitidaEm = em; x.arquivo = f.name;
+      if (x.mesNome) { const ano = Number(em.slice(0, 4)) - (MESN[x.mesNome] > Number(em.slice(5, 7)) ? 1 : 0); x.mes = ano + "-" + String(MESN[x.mesNome]).padStart(2, "0"); }
+      else { const d = parse(em); const a = new Date(d.getFullYear(), d.getMonth() - 1, 1); x.mes = a.getFullYear() + "-" + String(a.getMonth() + 1).padStart(2, "0"); }
+      const pd = txt.match(/(?:N\.?\s*PEDIDO|P\.?\s*O\.?)\s*:?\s*(\d{8,})/i); if (pd) x.po = pd[1];
+      x.ja = jaNoPainel(x);
+      x.destino = x.cancelada ? "ignorar" : x.ja ? "ja" : sugerir(x);
+      impLista.push(x);
+    }
+    toast.textContent = ""; renderImp();
+  }
+  function renderImp() {
+    const box = document.getElementById("imp-lista");
+    const abertos = rows.filter(r => r.status !== "emitida").sort((a, b) => String(b.mes).localeCompare(a.mes) || String(a.cod || "").localeCompare(String(b.cod || ""), "pt-BR", { numeric: true }));
+    box.replaceChildren(...impLista.map((x, k) => {
+      const d = el("div", "ir");
+      if (x.invalido) { const a = el("div"); a.append(el("div", "t", x.arquivo), el("div", "s", "Não achei o número da NF ou o valor no nome do arquivo.")); d.append(a, el("div"), el("div", "ign", "Ignorada")); return d; }
+      const a = el("div"); a.append(el("div", "t", "NF " + x.nfTxt + " · " + x.desc), el("div", "s", "Emitida " + fmt(parse(x.emitidaEm)) + (x.po ? " · pedido " + x.po : "") + (x.cancelada ? " · CANCELADA" : "")));
+      const c = el("div");
+      if (x.destino === "ja") c.append(el("div", "ja", "Já está no painel (" + mesLabel(x.ja.mes) + ")"));
+      else {
+        const sel = el("select"); sel.id = "imp-d-" + k; sel.setAttribute("aria-label", "Para onde vai a NF " + x.nf);
+        const op = (v, t) => { const o = el("option", null, t); o.value = v; if (v === x.destino) o.selected = true; return o; };
+        sel.append(op("novo", "Nota nova em " + mesLabel(x.mes)));
+        const g = el("optgroup"); g.label = "Orçamento que ainda não tem nota";
+        abertos.forEach(r => g.append(op(r._id, mesLabel(r.mes).slice(0, 3) + "/" + r.mes.slice(2, 4) + " · " + (r.cod ? r.cod + " " : "") + r.desc + " · " + brl(r.valor) + (mesmo(r.valor, x.valor) ? " (valor igual)" : r.valor > x.valor ? " (parte)" : ""))));
+        sel.append(g, op("ignorar", "Não salvar esta nota"));
+        sel.addEventListener("change", () => { x.destino = sel.value; resumoImp(); });
+        c.append(sel);
+      }
+      d.append(a, el("div", "val", brl(x.valor)), c); return d;
+    }));
+    resumoImp();
+  }
+  function resumoImp() {
+    const ok = impLista.filter(x => !x.invalido), ja = ok.filter(x => x.destino === "ja").length, sv = ok.filter(x => x.destino !== "ja" && x.destino !== "ignorar").length;
+    document.getElementById("imp-res").textContent = ok.length + (ok.length === 1 ? " nota lida" : " notas lidas") + " · " + ja + " já no painel · " + sv + " para salvar";
+    const b = document.getElementById("imp-salvar"); b.disabled = !sv; b.textContent = sv ? "Salvar " + sv + (sv === 1 ? " nota" : " notas") : "Nada novo para salvar";
+  }
+  document.getElementById("imp-btn").addEventListener("click", () => document.getElementById("imp-arq").click());
+  document.getElementById("imp-mais").addEventListener("click", () => document.getElementById("imp-arq").click());
+  document.getElementById("imp-arq").addEventListener("change", ev => { const fs = [...ev.target.files]; ev.target.value = ""; if (fs.length) lerArquivos(fs); });
+  document.getElementById("imp-fechar").addEventListener("click", () => { impLista = []; document.getElementById("imp").hidden = true; document.getElementById("imp-toast").textContent = ""; });
+  document.getElementById("imp-salvar").addEventListener("click", async () => {
+    const b = document.getElementById("imp-salvar"), toast = document.getElementById("imp-toast"); b.disabled = true;
+    let n = 0, erros = [];
+    for (const x of impLista.filter(x => !x.invalido && x.destino !== "ja" && x.destino !== "ignorar")) {
+      const obs = x.po ? "Pedido " + x.po : "";
+      let res;
+      if (x.destino === "novo") {
+        res = await db.from(T.notas).insert(toDb({ id: x.mes + "_NF" + x.nf, mes: x.mes, cod: "", desc: x.desc, valor: x.valor, status: "emitida", nf: x.nfTxt, emitidaEm: x.emitidaEm, obs }));
+      } else {
+        const r = rows.find(o => o._id === x.destino);
+        if (!r) { erros.push("NF " + x.nf); continue; }
+        if (r.valor > x.valor + 0.005) {
+          res = await db.from(T.notas).insert(toDb({ id: r._id + "_NF" + x.nf, mes: r.mes, cod: r.cod, desc: r.desc + " (parte)", valor: x.valor, status: "emitida", nf: x.nfTxt, emitidaEm: x.emitidaEm, obs: ("Parte do orçamento " + (r.cod || "") + " de " + brl(r.valor) + ". " + obs).trim() }));
+          if (!res.error) { const resto = Math.round((r.valor - x.valor) * 100) / 100; res = await db.from(T.notas).update(toDb({ valor: resto, obs: ((r.obs ? r.obs + " " : "") + "NF " + x.nfTxt + " emitida com " + brl(x.valor) + "; falta " + brl(resto) + ".").trim() })).eq("id", r._id); if (!res.error) r.valor = resto; }
+        } else {
+          const pt = { status: "emitida", nf: x.nfTxt, emitidaEm: x.emitidaEm }; if (!mesmo(r.valor, x.valor)) pt.obs = ((r.obs ? r.obs + " " : "") + "Valor da NF " + brl(x.valor) + " difere do orçamento.").trim();
+          if (obs && !pt.obs) pt.obs = r.obs ? r.obs : obs;
+          res = await db.from(T.notas).update(toDb(pt)).eq("id", r._id);
+          if (!res.error) Object.assign(r, pt);
+        }
+      }
+      if (res && res.error) erros.push("NF " + x.nf + ": " + res.error.message); else { n++; x.destino = "ja"; x.ja = { mes: x.mes }; }
+    }
+    await carregar();
+    impLista.forEach(x => { if (!x.invalido && x.destino === "ja") { const j = jaNoPainel(x); if (j) x.ja = j; } });
+    renderImp();
+    toast.textContent = (n ? n + (n === 1 ? " nota salva." : " notas salvas.") : "") + (erros.length ? " Não salvou: " + erros.join("; ") : "");
+  });
 
   function entrar() { document.getElementById("login").hidden = true; document.getElementById("app").hidden = false; carregar(); }
   function sair() { document.getElementById("app").hidden = true; document.getElementById("login").hidden = false; }
