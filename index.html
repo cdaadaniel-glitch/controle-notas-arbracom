@@ -53,37 +53,54 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .marca p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 #login .logo { justify-self: start; display: inline-grid; margin-bottom: 14px; }
 
-/* caminho do dinheiro: 3 etapas */
-.sec-t { font-size: 17px; font-weight: 800; margin: 0 0 4px; }
-.lead { margin: 0 0 14px; color: var(--muted); font-size: 14px; max-width: 65ch; }
-.caminho { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.etapa { background: var(--soft); border-radius: 12px; padding: 16px; display: grid; gap: 6px; align-content: start; border: 2px solid transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%; }
-.etapa:hover { border-color: var(--line); }
-.etapa[aria-expanded="true"] { border-color: var(--c); background: var(--bg); }
-.etapa .ver { font-size: 13px; font-weight: 700; color: var(--c); margin-top: 4px; }
-.etapa .ver::after { content: " ›"; }
-.etapa[aria-expanded="true"] .ver::after { content: " ⌄"; }
-.etapa-lista { margin-top: 16px; border: 2px solid var(--c); border-radius: 12px; padding: 4px 16px 8px; }
-.etapa-lista .el-cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; flex-wrap: wrap; }
-.etapa-lista h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--c); }
-.etapa-lista .tot { font-size: 12.5px; color: var(--muted); }
-.etapa-lista .item:last-child { border-bottom: 0; }
-.b-todo { background: var(--todo-soft); color: var(--todo); }
-.etapa .passo { font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-.etapa .passo i { font-style: normal; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--c-soft); color: var(--c); font-size: 12px; }
-.etapa .nome { font-size: 16px; font-weight: 800; }
-.etapa .v { font-family: var(--font-num); font-size: 24px; font-weight: 600; color: var(--c); overflow-wrap: anywhere; }
-.etapa .q { font-size: 13px; color: var(--muted); }
-.etapa .exp { font-size: 13px; margin-top: 4px; }
-.etapa .alerta { font-size: 13px; font-weight: 700; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 5px 8px; justify-self: start; }
+/* quadro: as três etapas lado a lado; no celular viram abas */
+.sec-t { font-size: 17px; font-weight: 800; margin: 0; }
+.lead { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; max-width: 70ch; }
 .e1 { --c: var(--todo); --c-soft: var(--todo-soft); }
-.e2 { --c: var(--accent); --c-soft: var(--accent-soft); }
+.e2 { --c: var(--warn); --c-soft: var(--warn-soft); }
 .e3 { --c: var(--ok); --c-soft: var(--ok-soft); }
-.barra { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin-top: 12px; background: var(--soft); }
+.b-todo { background: var(--todo-soft); color: var(--todo); }
+.barra { display: flex; gap: 2px; height: 8px; border-radius: 999px; overflow: hidden; margin-top: 14px; background: var(--soft); }
 .barra span { display: block; height: 100%; }
-.legenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
-.legenda b { color: var(--fg); }
-@media (max-width: 720px) { .caminho { grid-template-columns: 1fr; } .etapa .v { font-size: 21px; } .logo img { width: 140px; } }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.legenda b { color: var(--fg); font-family: var(--font-num); font-weight: 600; }
+.legenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; background: var(--c); }
+.qtabs { display: none; }
+.quadro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; margin-top: 16px; }
+.qcol { background: var(--soft); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 8px; min-width: 0; }
+.qch { padding: 6px 6px 8px; display: grid; gap: 2px; }
+.qch .n { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14.5px; }
+.qch .n i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.qch .n .k { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 600; font-family: var(--font-num); }
+.qch .v { font-family: var(--font-num); font-size: 22px; font-weight: 600; overflow-wrap: anywhere; }
+.qch .h { font-size: 12.5px; color: var(--muted); }
+.qch .alerta { font-size: 12.5px; font-weight: 700; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 4px 8px; justify-self: start; margin-top: 4px; }
+.qcard { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 8px; min-width: 0; }
+.qcard.hot { border-color: var(--bad); }
+.qcard .t { font-weight: 700; font-size: 14px; }
+.qcard .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.qcard .lin { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.qcard .val { font-family: var(--font-num); font-weight: 600; font-size: 15px; }
+.qcard .d { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.qcard .al { font-size: 12px; color: var(--bad); }
+.qcard .acts { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap; }
+.qcard .btn { padding: 7px 12px; }
+.qvazio { color: var(--muted); font-size: 13px; padding: 14px 6px; text-align: center; }
+.qmais { background: none; border: 0; color: var(--accent); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px; }
+@media (max-width: 720px) {
+  .legenda { display: none; }
+  .qtabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+  .qtabs button { border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 10px; padding: 8px; text-align: left; display: grid; gap: 2px; font: inherit; cursor: pointer; min-width: 0; }
+  .qtabs .l { font-size: 11.5px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .qtabs .l i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); flex: none; }
+  .qtabs .v { font-family: var(--font-num); font-weight: 600; font-size: 13px; overflow-wrap: anywhere; }
+  .qtabs button[aria-pressed="true"] { border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c); }
+  .quadro { grid-template-columns: 1fr; margin-top: 10px; }
+  .qcol:not(.on) { display: none; }
+  .qcol { background: none; border: 0; padding: 0; }
+  .qch { display: none; }
+  .logo img { width: 140px; }
+}
 
 /* atualizar notas pelos PDFs */
 .imp { border: 2px solid var(--accent); border-radius: 12px; padding: 4px 16px 14px; }
@@ -98,16 +115,6 @@ header { display: flex; justify-content: space-between; align-items: end; gap: 1
 .ir .ign { font-size: 13px; color: var(--muted); font-weight: 700; }
 @media (max-width: 720px) { .ir { grid-template-columns: minmax(0, 1fr) auto; } .ir > :nth-child(3) { grid-column: 1 / -1; } }
 
-/* precisa da sua atenção */
-.atencao { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.atencao .cab { padding: 12px 16px; background: var(--bad-soft); color: var(--bad); font-weight: 800; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.atencao.tudo-ok .cab { background: var(--ok-soft); color: var(--ok); }
-.at { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
-.at:hover { background: var(--soft); }
-.at .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
-.at .t { font-weight: 700; }
-.at .s { font-size: 13px; color: var(--muted); }
-.at .val { font-family: var(--font-num); font-weight: 600; text-align: right; }
 .tabdesc { font-size: 13px; color: var(--muted); margin: 10px 0 2px; }
 
 /* abas */
@@ -263,41 +270,11 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
 
   <section>
     <h2 class="sec-t" style="text-transform:none;letter-spacing:0;color:var(--fg)">Onde está o dinheiro</h2>
-    <p class="lead">Todo serviço passa por três etapas: vira nota, o cliente paga em até 40 dias, e o dinheiro entra. Toque numa etapa para ver as notas dela.</p>
-    <div class="caminho">
-      <button class="etapa e1" type="button" data-e="e1" aria-expanded="false" aria-controls="etapa-lista">
-        <div class="passo"><i>1</i>Etapa 1</div>
-        <div class="nome">Nota a emitir</div>
-        <div class="v" id="k-aemitir">—</div>
-        <div class="q" id="k-aemitir-n"></div>
-        <div class="exp">Serviço feito e orçamento pronto, mas a nota ainda não foi tirada.</div>
-        <span class="ver">Ver orçamentos</span>
-      </button>
-      <button class="etapa e2" type="button" data-e="e2" aria-expanded="false" aria-controls="etapa-lista">
-        <div class="passo"><i>2</i>Etapa 2</div>
-        <div class="nome">Aguardando pagamento</div>
-        <div class="v" id="k-areceber">—</div>
-        <div class="q" id="k-areceber-n"></div>
-        <div class="exp">Nota já emitida. O cliente paga até 40 dias depois da emissão.</div>
-        <div class="alerta" id="k-vencido" hidden></div>
-        <span class="ver">Ver notas</span>
-      </button>
-      <button class="etapa e3" type="button" data-e="e3" aria-expanded="false" aria-controls="etapa-lista">
-        <div class="passo"><i>3</i>Etapa 3</div>
-        <div class="nome">Recebido</div>
-        <div class="v" id="k-recebido">—</div>
-        <div class="q" id="k-recebido-n"></div>
-        <div class="exp">O cliente já pagou. Dinheiro na conta.</div>
-        <span class="ver">Ver notas</span>
-      </button>
-    </div>
+    <p class="lead">Cada nota anda da esquerda para a direita: tirar a nota, esperar o pagamento (até 40 dias) e receber.</p>
     <div class="barra" id="barra" aria-hidden="true"></div>
     <div class="legenda" id="legenda"></div>
-    <div class="etapa-lista" id="etapa-lista" hidden>
-      <div class="el-cab"><div><h3 id="etapa-tit"></h3><div class="tot num" id="etapa-tot"></div></div><button class="btn btn-ghost" type="button" id="etapa-fechar">Fechar</button></div>
-      <p class="tabdesc" id="etapa-dica"></p>
-      <div class="list" id="etapa-itens"></div>
-    </div>
+    <div class="qtabs" id="qtabs" role="group" aria-label="Etapa"></div>
+    <div class="quadro" id="quadro"></div>
   </section>
 
   <section class="imp" id="imp" hidden>
@@ -307,27 +284,14 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     <div class="sfoot"><span class="toast" id="imp-toast"></span><span class="sbtns"><button class="btn btn-ghost" type="button" id="imp-mais">Escolher mais PDFs</button><button class="btn btn-primary" type="button" id="imp-salvar">Salvar</button></span></div>
   </section>
 
-  <section class="atencao" id="atencao">
-    <div class="cab"><span id="at-tit">Precisa da sua atenção</span><span id="at-n"></span></div>
-    <div id="at-lista"></div>
-  </section>
-
   <section>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tab-receb" aria-selected="true" data-v="receb">A receber<span class="count" id="c-receb">0</span></button>
-      <button class="tab" role="tab" id="tab-meses" aria-selected="false" data-v="meses">Notas do mês</button>
+      <button class="tab" role="tab" id="tab-meses" aria-selected="true" data-v="meses">Notas do mês</button>
       <button class="tab" role="tab" id="tab-serv" aria-selected="false" data-v="serv">Chamados<span class="count" id="c-serv">0</span></button>
       <button class="tab" role="tab" id="tab-div" aria-selected="false" data-v="div">Avisos<span class="count" id="c-div">0</span></button>
     </div>
 
-    <div id="v-receb">
-      <p class="tabdesc">Notas emitidas que o cliente ainda não pagou, das mais urgentes para as mais novas. Quando o dinheiro cair, toque em "Já recebi".</p>
-      <div class="list" id="l-areceber"></div>
-      <div class="subhead"><h3>Recebidas</h3><div class="tot num" id="t-recebidas"></div></div>
-      <div class="list" id="l-recebidas"></div>
-    </div>
-
-    <div id="v-meses" hidden>
+    <div id="v-meses">
       <p class="tabdesc">Todos os orçamentos, separados por mês. Aqui você muda a situação de cada um e anota o número da nota.</p>
       <div class="filters" id="filters">
         <button class="chip" data-f="todos" aria-pressed="true">Todas</button>
@@ -402,7 +366,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
   const fmt = d => d ? d.toLocaleDateString("pt-BR") : "";
   const addDias = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  let rows = [], avisos = [], servs = [], servErro = "", filtro = "todos", db = null, view = "receb", mesSel = "";
+  let rows = [], avisos = [], servs = [], servErro = "", filtro = "todos", db = null, view = "meses", mesSel = "";
   let cliSel = "", temCliente = false;
   try { cliSel = localStorage.getItem("arbracom-cliente") || ""; } catch (e) {}
   const base = () => rows.filter(r => (!mesSel || r.mes === mesSel) && (!cliSel || r.cliente === cliSel));
@@ -437,53 +401,13 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
   document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
     view = t.dataset.v;
     document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t ? "true" : "false"));
-    ["receb", "meses", "serv", "div"].forEach(v => document.getElementById("v-" + v).hidden = v !== view);
+    ["meses", "serv", "div"].forEach(v => document.getElementById("v-" + v).hidden = v !== view);
   }));
   document.querySelectorAll("#filters .chip").forEach(b => b.addEventListener("click", () => {
     filtro = b.dataset.f;
     document.querySelectorAll("#filters .chip").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
     renderMeses();
   }));
-
-  function irPara(v) { const t = document.querySelector('.tab[data-v="' + v + '"]'); if (t) { t.click(); t.scrollIntoView({ behavior: "smooth", block: "start" }); } }
-  function renderResumo() {
-    const em = base().filter(r => r.status === "emitida");
-    const ar = em.filter(r => !r.recebida), rc = em.filter(r => r.recebida);
-    const venc = ar.filter(r => { const p = prazo(r); return p.dias != null && p.dias < 0; });
-    const semData = ar.filter(r => !r.emitidaEm);
-    const ae = base().filter(r => r.status === "a_emitir");
-    const pend = base().filter(r => r.status === "pendente"), conf = base().filter(r => r.status === "conferir");
-    const set = (id, l, unid) => { document.getElementById(id).textContent = brl(soma(l)); document.getElementById(id + "-n").textContent = l.length + " " + unid + (l.length === 1 ? "" : "s"); };
-    set("k-areceber", ar, "nota"); set("k-recebido", rc, "nota"); set("k-aemitir", ae, "orçamento");
-    const kv = document.getElementById("k-vencido"); kv.hidden = !venc.length; kv.textContent = brl(soma(venc)) + " atrasado";
-    const tot = soma(ae) + soma(ar) + soma(rc), pc = v => tot ? v / tot * 100 : 0;
-    const barra = document.getElementById("barra");
-    barra.replaceChildren(...[[ae, "--todo"], [ar, "--accent"], [rc, "--ok"]].map(([l, c]) => { const sp = el("span"); sp.style.width = pc(soma(l)) + "%"; sp.style.background = "var(" + c + ")"; return sp; }));
-    const lg = document.getElementById("legenda"); lg.replaceChildren();
-    const lt = el("span", null, "Total " + (mesSel ? "do mês" : "geral") + ": "); lt.append(el("b", "num", brl(tot)));
-    const lr = el("span", null, "Já recebido: "); lr.append(el("b", null, Math.round(pc(soma(rc))) + "%"));
-    lg.append(lt, lr);
-    // precisa da sua atenção
-    const its = [];
-    const plural = (n, a, b) => n + " " + (n === 1 ? a : b);
-    if (venc.length) its.push(["--bad", plural(venc.length, "nota passou do prazo de pagamento", "notas passaram do prazo de pagamento"), venc.slice(0, 3).map(r => (r.nf ? "NF " + r.nf + " · " : "") + r.desc).join("; ") + ". Cobrar o cliente.", soma(venc), "receb"]);
-    if (pend.length) its.push(["--warn", plural(pend.length, "pedido cobrado ainda sem nota", "pedidos cobrados ainda sem nota"), "O cliente já pediu, falta emitir a nota.", soma(pend), "meses", "pendente"]);
-    if (conf.length) its.push(["--todo", plural(conf.length, "valor para conferir", "valores para conferir"), "O valor do orçamento precisa ser conferido.", soma(conf), "meses", "conferir"]);
-    if (semData.length) its.push(["--muted", plural(semData.length, "nota sem data de emissão", "notas sem data de emissão"), "Sem a data não dá para saber quando vence.", soma(semData), "receb"]);
-    const box = document.getElementById("atencao");
-    box.classList.toggle("tudo-ok", !its.length);
-    document.getElementById("at-tit").textContent = its.length ? "Precisa da sua atenção" : "Tudo em dia, nada precisa da sua atenção";
-    document.getElementById("at-n").textContent = its.length ? plural(its.length, "item", "itens") : "";
-    document.getElementById("at-lista").replaceChildren(...its.map(([c, t, sub, v, aba, f]) => {
-      const b = el("button", "at"); b.type = "button"; b.style.setProperty("--c", "var(" + c + ")");
-      const tx = el("div"); tx.append(el("div", "t", t), el("div", "s", sub));
-      b.append(el("span", "dot"), tx, el("span", "val", brl(v)));
-      b.addEventListener("click", () => { if (f) { const ch = document.querySelector('#filters .chip[data-f="' + f + '"]'); if (ch) ch.click(); } irPara(aba); });
-      return b;
-    }));
-    document.getElementById("c-receb").textContent = ar.length;
-    document.getElementById("c-div").textContent = avisos.length;
-  }
 
   function dataInput(r, campo, label) {
     const i = el("input", "date"); i.type = "date"; i.id = campo + "-" + r._id; i.value = r[campo] || ""; i.setAttribute("aria-label", label + " de " + (r.desc || ""));
@@ -508,70 +432,73 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
   const ordAR = (a, b) => { const pa = prazo(a), pb = prazo(b); return (pa.dias ?? -1e9) - (pb.dias ?? -1e9) || String(a.mes).localeCompare(b.mes); };
   const ordRC = (a, b) => String(b.recebidaEm).localeCompare(String(a.recebidaEm)) || String(b.mes).localeCompare(a.mes);
   function cabItem(r) { const a = titulo(r, "t"); a.append(el("div", "s", (r.cliente !== "Swift" ? r.cliente + " · " : "") + mesLabel(r.mes) + (r.cod ? " · orç. " + r.cod : "") + (r.nf ? " · NF " + r.nf : ""))); if (a.sub) a.append(a.sub); return a; }
-  function itemAR(r) {
-    const p = prazo(r), it = el("div", "item");
-    const w = el("div", "when"); w.append(el("span", "badge " + p.cls, p.txt));
+  const OAE = { pendente: 0, conferir: 1, a_emitir: 2 };
+  const ordAE = (a, b) => (OAE[a.status] - OAE[b.status]) || String(b.mes).localeCompare(String(a.mes)) || b.valor - a.valor;
+  const dm = d => d ? String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") : "";
+  function cardAE(r) {
+    const c = el("div", "qcard");
+    const [pc, pt] = r.status === "pendente" ? ["b-warn", "Cobrado, sem nota"] : r.status === "conferir" ? ["b-bad", "Conferir valor"] : ["b-todo", "Nota a emitir"];
+    const lin = el("div", "lin"); lin.append(el("span", "val", brl(r.valor)), el("span", "badge " + pc, pt));
+    c.append(cabItem(r), lin);
+    if (r.alerta) c.append(el("div", "al", r.alerta));
+    const acts = el("div", "acts"); const inp = el("input", "nf"); inp.id = "ae-nf-" + r._id; inp.value = r.nf || ""; inp.placeholder = "nº NF"; inp.setAttribute("aria-label", "Número da NF de " + (r.desc || ""));
+    const b = el("button", "btn btn-primary", "Já emiti"); b.type = "button";
+    b.addEventListener("click", () => { b.disabled = true; const pt2 = { status: "emitida", emitidaEm: r.emitidaEm || iso(hoje()) }; if (inp.value.trim()) pt2.nf = inp.value.trim(); save(r._id, pt2); });
+    acts.append(inp, b); c.append(acts); return c;
+  }
+  function cardAR(r) {
+    const p = prazo(r), c = el("div", "qcard" + (p.dias != null && p.dias < 0 ? " hot" : ""));
+    const lin = el("div", "lin"); lin.append(el("span", "val", brl(r.valor)), el("span", "badge " + p.cls, p.txt));
     const d = el("div", "d");
-    if (p.prev) d.textContent = "Emitida " + fmt(parse(r.emitidaEm)) + " · pagar até " + fmt(p.prev);
-    else { d.textContent = "Data de emissão: "; d.append(dataInput(r, "emitidaEm", "Data de emissão")); }
-    w.append(d);
-    const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já recebi"); b.type = "button";
+    if (p.prev) d.textContent = "Emitida " + dm(parse(r.emitidaEm)) + " · pagar até " + fmt(p.prev);
+    else d.append("Emissão:", dataInput(r, "emitidaEm", "Data de emissão"));
+    const acts = el("div", "acts"); const b = el("button", "btn btn-primary", "Já recebi"); b.type = "button";
     b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: true, recebidaEm: iso(hoje()) }); });
-    act.append(b);
-    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
+    acts.append(b); c.append(cabItem(r), lin, d, acts); return c;
   }
-  function itemRC(r) {
-    const it = el("div", "item");
-    const w = el("div", "when"); w.append(el("span", "badge b-ok", "Recebida"));
-    const d = el("div", "d"); d.textContent = "em "; d.append(dataInput(r, "recebidaEm", "Data do recebimento")); w.append(d);
-    const act = el("div", "act"); const b = el("button", "btn btn-ghost", "Desfazer"); b.type = "button";
-    b.addEventListener("click", () => { b.disabled = true; save(r._id, { recebida: false, recebidaEm: "" }); });
-    act.append(b);
-    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
+  function cardRC(r) {
+    const c = el("div", "qcard");
+    const lin = el("div", "lin"); lin.append(el("span", "val", brl(r.valor)), el("span", "badge b-ok", "Recebida" + (r.recebidaEm ? " " + dm(parse(r.recebidaEm)) : "")));
+    const d = el("div", "d"); d.append("Recebida em", dataInput(r, "recebidaEm", "Data do recebimento"));
+    const u = el("button", "link", "Desfazer"); u.type = "button"; u.addEventListener("click", () => { u.disabled = true; save(r._id, { recebida: false, recebidaEm: "" }); });
+    d.append(u); c.append(cabItem(r), lin, d); return c;
   }
-  function itemAE(r) {
-    const it = el("div", "item");
-    const w = el("div", "when"); w.append(el("span", "badge b-todo", "Nota a emitir"));
-    const d = el("div", "d"); const inp = el("input", "nf"); inp.id = "ae-nf-" + r._id; inp.value = r.nf || ""; inp.placeholder = "nº NF"; inp.setAttribute("aria-label", "Número da NF de " + (r.desc || ""));
-    d.append("NF ", inp); w.append(d);
-    const act = el("div", "act"); const b = el("button", "btn btn-primary", "Já emiti"); b.type = "button";
-    b.addEventListener("click", () => { b.disabled = true; const pt = { status: "emitida", emitidaEm: r.emitidaEm || iso(hoje()) }; if (inp.value.trim()) pt.nf = inp.value.trim(); save(r._id, pt); });
-    act.append(b);
-    it.append(cabItem(r), w, el("div", "val", brl(r.valor)), act); return it;
-  }
-  function renderReceb() {
-    const em = base().filter(r => r.status === "emitida");
-    const ar = em.filter(r => !r.recebida).sort(ordAR), rc = em.filter(r => r.recebida).sort(ordRC);
-    const box = document.getElementById("l-areceber");
-    if (!ar.length) box.replaceChildren(el("div", "empty", "Nenhuma nota emitida esperando pagamento."));
-    else box.replaceChildren(...ar.map(itemAR));
-    document.getElementById("t-recebidas").textContent = rc.length ? rc.length + (rc.length === 1 ? " nota · " : " notas · ") + brl(soma(rc)) : "";
-    const lb = document.getElementById("l-recebidas");
-    if (!rc.length) lb.replaceChildren(el("div", "empty", "Quando você tocar em \"Já recebi\" numa nota, ela aparece aqui."));
-    else lb.replaceChildren(...rc.map(itemRC));
-  }
-
-  // tocar numa etapa abre a lista só das notas dela
-  let etapaSel = "";
-  const ETAPAS = {
-    e1: { tit: "Nota a emitir", vazio: "Nenhum orçamento esperando nota.", dica: "Quando tirar a nota, digite o número e toque em \"Já emiti\". Ela passa para a etapa 2.", lista: () => base().filter(r => r.status === "a_emitir").sort((a, b) => String(b.mes).localeCompare(a.mes)), item: itemAE },
-    e2: { tit: "Aguardando pagamento", vazio: "Nenhuma nota esperando pagamento.", dica: "Das mais urgentes para as mais novas. Quando o dinheiro cair, toque em \"Já recebi\".", lista: () => base().filter(r => r.status === "emitida" && !r.recebida).sort(ordAR), item: itemAR },
-    e3: { tit: "Recebido", vazio: "Nenhuma nota recebida ainda.", dica: "Notas que o cliente já pagou, das mais recentes para as mais antigas.", lista: () => base().filter(r => r.status === "emitida" && r.recebida).sort(ordRC), item: itemRC },
-  };
-  document.querySelectorAll(".etapa[data-e]").forEach(b => b.addEventListener("click", () => {
-    etapaSel = etapaSel === b.dataset.e ? "" : b.dataset.e; renderEtapa();
-    if (etapaSel) document.getElementById("etapa-lista").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }));
-  document.getElementById("etapa-fechar").addEventListener("click", () => { etapaSel = ""; renderEtapa(); });
-  function renderEtapa() {
-    document.querySelectorAll(".etapa[data-e]").forEach(b => b.setAttribute("aria-expanded", b.dataset.e === etapaSel ? "true" : "false"));
-    const box = document.getElementById("etapa-lista"); box.hidden = !etapaSel; if (!etapaSel) return;
-    const E = ETAPAS[etapaSel], l = E.lista();
-    box.className = "etapa-lista " + etapaSel;
-    document.getElementById("etapa-tit").textContent = E.tit + (mesSel ? " · " + mesLabel(mesSel) : "");
-    document.getElementById("etapa-tot").textContent = l.length + (l.length === 1 ? " item · " : " itens · ") + brl(soma(l));
-    document.getElementById("etapa-dica").textContent = E.dica;
-    document.getElementById("etapa-itens").replaceChildren(...(l.length ? l.map(E.item) : [el("div", "empty", E.vazio)]));
+  const COLQ = [
+    { k: "e1", nome: "Nota a emitir", dica: "Serviço feito, falta tirar a nota.", vazio: "Nenhum orçamento esperando nota.", lista: () => base().filter(r => r.status in OAE).sort(ordAE), card: cardAE },
+    { k: "e2", nome: "Aguardando pagamento", dica: "O cliente paga até 40 dias depois da nota.", vazio: "Nenhuma nota esperando pagamento.", lista: () => base().filter(r => r.status === "emitida" && !r.recebida).sort(ordAR), card: cardAR },
+    { k: "e3", nome: "Recebido", dica: "Dinheiro na conta.", vazio: "Quando você tocar em \"Já recebi\", a nota vem para cá.", lista: () => base().filter(r => r.status === "emitida" && r.recebida).sort(ordRC), card: cardRC },
+  ];
+  let colSel = "e2", recTodas = false;
+  try { colSel = localStorage.getItem("arbracom-coluna") || "e2"; } catch (e) {}
+  const REC_LIM = 6;
+  function renderQuadro() {
+    const ls = COLQ.map(c => c.lista()), tots = ls.map(soma), tot = tots.reduce((a, b) => a + b, 0);
+    document.getElementById("barra").replaceChildren(...COLQ.map((c, i) => { const sp = el("span", c.k); sp.style.flex = String(tot ? tots[i] / tot : 0); sp.style.background = "var(--c)"; return sp; }));
+    const lg = document.getElementById("legenda");
+    lg.replaceChildren(...COLQ.map((c, i) => { const sp = el("span", c.k); sp.append(el("i"), c.nome + " ", el("b", null, brl(tots[i]))); return sp; }));
+    if (tot) { const r = el("span", null, "Já recebido: "); r.append(el("b", null, Math.round(tots[2] / tot * 100) + "%")); lg.append(r); }
+    document.getElementById("qtabs").replaceChildren(...COLQ.map((c, i) => {
+      const b = el("button", c.k); b.type = "button"; b.setAttribute("aria-pressed", colSel === c.k ? "true" : "false");
+      const l = el("span", "l"); l.append(el("i"), c.nome); b.append(l, el("span", "v", brl(tots[i])));
+      b.addEventListener("click", () => { colSel = c.k; try { localStorage.setItem("arbracom-coluna", colSel); } catch (e) {} renderQuadro(); });
+      return b;
+    }));
+    document.getElementById("quadro").replaceChildren(...COLQ.map((c, i) => {
+      const col = el("div", "qcol " + c.k + (colSel === c.k ? " on" : "")), l = ls[i];
+      const h = el("div", "qch"), n = el("div", "n"); n.append(el("i"), c.nome, el("span", "k", String(l.length)));
+      h.append(n, el("div", "v", brl(tots[i])), el("div", "h", c.dica));
+      if (c.k === "e2") { const venc = l.filter(r => { const p = prazo(r); return p.dias != null && p.dias < 0; }); if (venc.length) h.append(el("div", "alerta", brl(soma(venc)) + " atrasado")); }
+      col.append(h);
+      const mostra = c.k === "e3" && !recTodas ? l.slice(0, REC_LIM) : l;
+      if (!l.length) col.append(el("div", "qvazio", c.vazio));
+      col.append(...mostra.map(c.card));
+      if (c.k === "e3" && l.length > REC_LIM) {
+        const m = el("button", "qmais", recTodas ? "Mostrar só as mais recentes" : "Ver todas as " + l.length + " recebidas"); m.type = "button";
+        m.addEventListener("click", () => { recTodas = !recTodas; renderQuadro(); }); col.append(m);
+      }
+      return col;
+    }));
+    document.getElementById("c-div").textContent = avisos.length;
   }
 
   function renderMeses() {
@@ -615,7 +542,7 @@ form.serv input, form.serv textarea { font: inherit; font-size: 14px; padding: 7
     }));
   }
 
-  function renderAll() { renderSelMes(); renderResumo(); renderEtapa(); renderReceb(); renderMeses(); renderServ(); renderAvisos(); }
+  function renderAll() { renderSelMes(); renderQuadro(); renderMeses(); renderServ(); renderAvisos(); }
   const setConn = t => document.getElementById("conn").textContent = t;
 
   async function save(id, patch) {
